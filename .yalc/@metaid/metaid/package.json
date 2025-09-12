@@ -1,0 +1,64 @@
+{
+  "name": "@metaid/metaid",
+  "version": "1.5.21",
+  "description": "MetaID is a library for MetaID protocol. It provides a set of functions to manage the DID document and the DID transaction.",
+  "type": "module",
+  "main": "./dist/metaid.js",
+  "module": "./dist/metaid.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/metaid.js",
+      "require": "./dist/metaid.umd.cjs"
+    }
+  },
+  "scripts": {
+    "hello": "tsc && node dist/index.js",
+    "build": "vite build",
+    "b": "vite build",
+    "test": "vitest --ui"
+  },
+  "keywords": [
+    "MetaID",
+    "metaid",
+    "blockchain",
+    "DID protocol",
+    "mvc",
+    "Microvision Chain",
+    "MetaID-Labs"
+  ],
+  "author": "MetaID-Labs",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/metaid-developers/metaid"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@bitcoin-js/tiny-secp256k1-asmjs": "^2.2.3",
+    "@metaid/metaid": "^1.2.7",
+    "@metaid/metaid-cli": "0.0.2",
+    "@okxweb3/crypto-lib": "^1.0.1",
+    "@scure/bip39": "^1.2.2",
+    "@tanstack/react-query": "^5.64.0",
+    "@types/ramda": "^0.29.12",
+    "axios": "^1.5.0",
+    "bip32": "^4.0.0",
+    "bip39": "^3.1.0",
+    "bitcoinjs-lib": "^6.1.5",
+    "chalk": "3.0.0",
+    "dayjs": "^1.11.9",
+    "meta-contract": "^0.3.35",
+    "ramda": "^0.29.1",
+    "uuid": "^9.0.1",
+    "yalc": "^1.0.0-pre.53",
+    "zustand": "^5.0.3"
+  },
+  "yalcSig": "00dbc388ed2a9155cbf1263f38e1b7f7"
+}

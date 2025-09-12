@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>测试页面</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+    <script>
+    
+      // alert("jeifj")
+      window.onload = function () {
+    
+      
+        /* 监听rn消息
+           ------------------------------------------------------------------------------------------------------------- */
+        const eventListener = (nativeEvent) => {
+          // const {actionType, extra} = nativeEvent.data && JSON.parse(nativeEvent.data) || {}
+          // console.log("接受到RN信息：",nativeEvent.data)
+    
+          alert("webView收到信息" + nativeEvent.data);
+          // window.postMessage(nativeEvent.data);
+
+        };
+        //安卓用document，ios用window
+        window.addEventListener("message", eventListener);
+        document.addEventListener("message", eventListener);
+    
+        // /* 发消息给rn
+        //    ------------------------------------------------------------------------------------------------------------- */
+        // // 1、查看大图
+        document.getElementById("viewPicture").onclick = async function () {
+        //  alert(824683246)
+        // window.metaidwallet.getAddress()
+        window.postMessage("来自webView111");
+        // window.metaidwallet.getAddress().then(address => {
+        //   alert('address:'+address)
+        // })
+
+        // let result=await window.metaidwallet.getAddress()
+        // alert(result)
+
+        // alert(window.metaidwallet.getAddress())
+        //  window.metaidwallet.getAddress().then(res => {
+        //   // alert(res)
+        //  })     
+         
+         //  const metaidwallet = {
+        //   ping: () => {},
+        //   getAddress: () => {},
+        //   getPublickey: () => {},
+        //   signTransaction: () => {},
+
+        //   //...
+        //  }
+        //  window.metaidwallet = metaidwallet
+        };
+      };
+
+  
+      function test() {
+        //  console.log(11111)
+        // alert(1111);
+        // window.postMessage("来自webView");
+      }
+
+    </script>
+ 
+  </head>
+  <body>
+    <!-- onclick="test()" -->
+    <div style="text-align: center">
+      <button id="viewPicture">1,viewPicture</button>
+      <p style="text-align: center">
+        receive react native data: <span id="data"></span>
+      </p>
+    </div>
+  </body>
+</html>
+
+

@@ -1,0 +1,16 @@
+# 忽略构建产物和临时文件
+node_modules
+.expo
+.expo-shared
+dist
+build
+.DS_Store
+npm-debug.log*
+yarn-error.log*
+
+# 忽略本地配置和缓存
+.env
+.env.*
+.vscode
+.idea
+

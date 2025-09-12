@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>测试页面</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="shortcut icon"
+      href="https://www.okx.com/cdn/assets/imgs/226/EB771F0EE8994DD5.png"
+      type="image/png"
+    />
+
+    <script>
+      window.onload = function () {
+        //connect
+        document.getElementById("viewPicture").onclick = async function () {
+          const result = await window.metaidwallet.getAddress({
+            data: "11111",
+            message: "22222",
+            test: "33333",
+          });
+          alert("result:" + result);
+        };
+
+        //
+        document.getElementById("viewPicture1").onclick = function () {};
+      };
+    </script>
+
+    <style>
+      .container {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 15px;
+        margin-top: 10px;
+      }
+      .container1 {
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-top: 10px;
+        font-size: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="text-align: center; display: flex; flex-direction: column">
+      <button id="viewPicture" class="container">1.connect</button>
+      <button id="viewPicture1" class="container1">2.getPublick</button>
+      <button id="viewPicture2" class="container">3.getAddress</button>
+    </div>
+  </body>
+</html>
