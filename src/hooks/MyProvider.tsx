@@ -20,6 +20,8 @@ type GlobalContext = {
   updateAccountIndex;
   mvcAddress;
   updateMvcAddress;
+  dogeAddress;
+  updateDogeAddress;
   metaletWallet: MetaletWallet;
   updateMetaletWallet;
   currentSumBalance: string;
@@ -104,6 +106,12 @@ export const UserProvider = ({ children }) => {
   const [mvcAddress, setMvcAddress] = useState('');
   const updateMvcAddress = (newData) => {
     setMvcAddress(newData);
+  };
+
+  // mvcAddress 当前地址
+  const [dogeAddress, setDogeAddress] = useState('');
+  const updateDogeAddress = (newData) => {
+    setDogeAddress(newData);
   };
 
   const [btcAddress, setBtcAddress] = useState('');
@@ -220,6 +228,8 @@ export const UserProvider = ({ children }) => {
     updateAccountIndex,
     mvcAddress,
     updateMvcAddress,
+    dogeAddress,
+    updateDogeAddress,
     metaletWallet,
     updateMetaletWallet,
     currentSumBalance,

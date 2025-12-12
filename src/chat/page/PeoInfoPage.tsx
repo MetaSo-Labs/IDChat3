@@ -10,8 +10,13 @@ import {
 } from '@/constant/Widget';
 import { grayNormalColor, metaStyles, normalColor } from '@/constant/Constants';
 import { useTranslation } from 'react-i18next';
-import { goBack, navigate } from '@/base/NavigationService';
-import { compressToTarget, compressToTargetChip, getImageAsBase64, getPicImage } from '@/utils/ImageUtils';
+import { goBack, navigate, reSets } from '@/base/NavigationService';
+import {
+  compressToTarget,
+  compressToTargetChip,
+  getImageAsBase64,
+  getPicImage,
+} from '@/utils/ImageUtils';
 import { isEmpty, isNotEmpty } from '@/utils/StringUtils';
 import { createOrUpdateUserInfo, getEcdhPublickey, getMVCRewards } from '@/wallet/userInfo';
 import useUserStore from '@/stores/useUserStore';
@@ -23,6 +28,7 @@ import {
 } from '@/wallet/walletUtils';
 import { useData } from '@/hooks/MyProvider';
 import { getRandomID, getRandomNum } from '@/utils/WalletUtils';
+import { sleep } from '@/lib/helpers';
 
 export default function PeoInfoPage() {
   const { t } = useTranslation();
@@ -107,6 +113,7 @@ export default function PeoInfoPage() {
         );
 
         console.log('getMVCRewards result ', result);
+         await sleep(3000);
         if (result.code == 0) {
           setIsShowLoading(false);
           ToastView({ text: 'successfully', type: 'success' });
@@ -115,7 +122,9 @@ export default function PeoInfoPage() {
           useUserStore.getState().updateUserField('avatarLocalUri', selectedImage);
           updateSwitchAccount(getRandomID());
           updateReloadKey(getRandomNum());
-          navigate('Tabs');
+          reSets('Tabs');
+          // navigate('Tabs');
+
           // navigate('SplashPage');
         } else {
           setIsShowLoading(false);

@@ -3,3 +3,4 @@ export const logout_event = 'Logout';
 export const account_switch = 'onAccountSwitch';
 export const refresh_event = 'onRefresh';
 export const tab_change_event = 'onTabChange';
+export const on_language_change = 'onLanguageChange';

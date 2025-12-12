@@ -48,7 +48,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import useUserStore from '@/stores/useUserStore';
 import { getMetaIDUserImageUrl, getUserMetaIDInfo, isRegisterMetaID } from '../com/metaIDUtils';
 import { getCurrentMvcWallet } from '@/wallet/wallet';
-import { UerMetaIDInfo } from '@/api/type/UserMetaIDinfoBean';
 import { isNotEmpty } from '@/utils/StringUtils';
 import { eventBus, logout_Bus } from '@/utils/EventBus';
 import { WalletBean } from '@/bean/WalletBean';
@@ -56,6 +55,7 @@ import { registerForPushNotificationsAsync } from '@/utils/PushUtils';
 import { UpdateData } from '@/api/type/Update';
 import { fetchCheckIDChatUpgrade, fetchCheckUpgrade } from '@/api/metaletservice';
 import * as Clipboard from 'expo-clipboard';
+import { UserMetaIDinfoBean } from '@/api/type/UserMetaIDinfoBean';
 
 export const BTC_NETWORK = 'mainnet';
 export const BTC_NETWORK_TEST = 'testnet';
@@ -135,7 +135,7 @@ export default function ChatSettingsPage(props: any) {
 
   async function intUserMetaIDInfo() {
     if (isRegisterMetaID()) {
-      const metaIDInfo: UerMetaIDInfo = await getUserMetaIDInfo();
+      const metaIDInfo: UserMetaIDinfoBean = await getUserMetaIDInfo();
       console.log('metaIDInfo ', metaIDInfo);
 
       const currentStorageWallet: WalletBean = await getStorageCurrentWallet();
@@ -200,13 +200,13 @@ export default function ChatSettingsPage(props: any) {
       console.log('codeVersion', codeVersion);
       console.log('buildNumber', buildNumber);
 
-      if (codeVersion > parseFloat(buildNumber)) {
+      if (codeVersion > parseFloat(buildNumber)) { 
         console.log('update  显示更新弹窗');
         setIsShowLoading(false);
         setUpdate(true);
       }
     }
-  }
+  }                                                                                                                                                      
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -382,7 +382,7 @@ export default function ChatSettingsPage(props: any) {
               </View>
             </View>
 
-            <TouchableWithoutFeedback
+           <TouchableWithoutFeedback
               onPress={() => {
                 navigate('DappWebsPage', { url: 'https://show.now' });
               }}
@@ -403,7 +403,6 @@ export default function ChatSettingsPage(props: any) {
                   style={{ width: 30, height: 30 }}
                 />
                 <Text style={{ marginLeft: 10, color: '#303133', fontSize: 16 }}>
-                  {/* {t('chat_settings_settings')} */}
                   Buzz
                 </Text>
                 <View style={{ flex: 1 }} />
@@ -411,8 +410,8 @@ export default function ChatSettingsPage(props: any) {
                   source={require('@image/list_icon_ins.png')}
                   style={{ width: 20, height: 20 }}
                 />
-              </View>
-            </TouchableWithoutFeedback>
+              </View> 
+            </TouchableWithoutFeedback>  
 
             <TouchableWithoutFeedback
               onPress={() => {
@@ -422,7 +421,7 @@ export default function ChatSettingsPage(props: any) {
               <View
                 style={{
                   flexDirection: 'row',
-                  marginTop: 20,
+                  marginTop: 30,
                   alignItems: 'center',
                   justifyContent: 'center',
                   backgroundColor: '#fff',
@@ -524,9 +523,9 @@ export default function ChatSettingsPage(props: any) {
 
             <TouchableWithoutFeedback
               onPress={() => {
-                const rand = getRandomID();
-                console.log('随机数' + rand);
-                updateWebLogout(rand);
+                // const rand = getRandomID();
+                // console.log('随机数' + rand);
+                // updateWebLogout(rand);
                 navigate('SwitchAccountPage');
               }}
             >

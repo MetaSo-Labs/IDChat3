@@ -1,5 +1,5 @@
 import { BASE_METAID_IO_URL, fetchUserMetaIDInfo } from '@/api/metaletservice';
-import { UerMetaIDInfo } from '@/api/type/UserMetaIDinfoBean';
+import { UserMetaIDinfoBean } from '@/api/type/UserMetaIDinfoBean';
 import { ToastView } from '@/constant/Widget';
 import useUserStore from '@/stores/useUserStore';
 import { isNotEmpty } from '@/utils/StringUtils';
@@ -8,8 +8,10 @@ import { getCurrentMvcWallet } from '@/wallet/wallet';
 export async function isRegisterMetaID() {
   //   console.log('isRegisterMetaID address:' + address);
   const wallet = await getCurrentMvcWallet();
-  const result: UerMetaIDInfo = await fetchUserMetaIDInfo(wallet.getAddress());
-  //   console.log('isRegisterMetaID result:' + JSON.stringify(result));
+  console.log('isRegisterMetaID address:' + wallet.getAddress());
+
+  const result: UserMetaIDinfoBean = await fetchUserMetaIDInfo(wallet.getAddress());
+  console.log('isRegisterMetaID result:' + JSON.stringify(result));
   if (isNotEmpty(result.name)) {
     return true;
   } else {
@@ -30,8 +32,8 @@ export async function isUserLogin() {
 
 export async function userLogin() {
   const wallet = await getCurrentMvcWallet();
-  const result: UerMetaIDInfo = await fetchUserMetaIDInfo(wallet.getAddress());
-//   const useInfo = useUserStore.getState().userInfo;
+  const result: UserMetaIDinfoBean = await fetchUserMetaIDInfo(wallet.getAddress());
+  //   const useInfo = useUserStore.getState().userInfo;
   //   console.log('isRegisterMetaID result:' + JSON.stringify(result));
   if (isNotEmpty(result.name)) {
     useUserStore
@@ -42,10 +44,10 @@ export async function userLogin() {
   }
 }
 
-export async function getUserMetaIDInfo(): Promise<UerMetaIDInfo> {
+export async function getUserMetaIDInfo(): Promise<UserMetaIDinfoBean> {
   const wallet = await getCurrentMvcWallet();
   //   console.log('isRegisterMetaID address:' + address);
-  const result: UerMetaIDInfo = await fetchUserMetaIDInfo(wallet.getAddress());
+  const result: UserMetaIDinfoBean = await fetchUserMetaIDInfo(wallet.getAddress());
   //   console.log('isRegisterMetaID result:' + JSON.stringify(result));
   return result;
 }

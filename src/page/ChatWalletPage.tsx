@@ -38,6 +38,7 @@ import {
   wallet_mode_hot,
   wallet_language_key,
   wallet_mode_observer,
+  network_doge,
 } from '../utils/AsyncStorageUtil';
 import { AddressType, Chain } from '@metalet/utxo-wallet-service';
 import { BtcWallet, MvcWallet } from '@metalet/utxo-wallet-service';
@@ -75,6 +76,8 @@ import MetaIDPage from './nft/MetaIDPage';
 import { BtcHotWallet } from '@metalet/utxo-wallet-sdk';
 import i18n from '@/language/i18n';
 import { useTranslation } from 'react-i18next';
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import { getDogeCoinWallet } from '@/chat/wallet/doge/DogeCoinWallet';
 
 const storage = createStorage();
 
@@ -115,6 +118,7 @@ export default function ChatWalletPage({ navigation }) {
 
   //当前网络地址
   const { mvcAddress, updateMvcAddress } = useData();
+  const { dogeAddress, updateDogeAddress } = useData();
   const { btcAddress, updateBtcAddress } = useData();
 
   const { needRefreshHome, updateNeedRefreshHome } = useData();
@@ -274,8 +278,9 @@ export default function ChatWalletPage({ navigation }) {
     metaletWallet.currentSpaceAssert = showbalance.spaceAssert;
     metaletWallet.currentBtcNa = showbalance.btcNa;
     metaletWallet.currentBtcSafeBalance = showbalance.btcSafeBalance;
+    metaletWallet.currentDogeAssert = showbalance.dogeAssert;
+    metaletWallet.currentDogeBalance = showbalance.dogeBalance;
 
-    // console.log("metaletWallet 余额刷新 ", metaletWallet.currentMvcBalance);
     updateSpaceBalance(showbalance.spaceBalance);
     updateSetBtcBalance(showbalance.btcBalance);
 
@@ -331,6 +336,7 @@ export default function ChatWalletPage({ navigation }) {
 
       const nowWallet = await getStorageCurrentWallet();
       const nowAccount = await getCurrentWalletAccount();
+      const nowDogeWallet = await getDogeCoinWallet();
 
       setWalletName(nowWallet.name);
       setaccountName(nowAccount.name);
@@ -351,11 +357,13 @@ export default function ChatWalletPage({ navigation }) {
       const currentBtcWallet = await getCurrentBtcWallet();
 
       updateMvcAddress(mvcWallet.getAddress());
+      updateDogeAddress(nowDogeWallet.getAddress());
       // console.log('address mvc : ',mvcWallet.getAddress())
       updateBtcAddress(currentBtcWallet.getAddress());
 
       metaletWallet.currentBtcWallet = currentBtcWallet;
       metaletWallet.currentMvcWallet = mvcWallet;
+      metaletWallet.currentDogeWallet = nowDogeWallet;
       metaletWallet.btcLegacyWallet = btcLegacyWallet;
       metaletWallet.btcNativeSegwitWallet = btcNativeSegwitWallet;
       metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
@@ -365,6 +373,7 @@ export default function ChatWalletPage({ navigation }) {
       //webs
       const btcWalletWebs = metaletWallet.currentBtcWallet;
       const mvcWalletWebs = metaletWallet.currentMvcWallet;
+
       setCurrentWallet({ btcWallet: btcWalletWebs, mvcWallet: mvcWalletWebs });
 
       updateMetaletWallet(metaletWallet);
@@ -940,6 +949,67 @@ export default function ChatWalletPage({ navigation }) {
                 </TouchableWithoutFeedback>
               </View>
 
+              {/* mvc */}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginTop: 20,
+                  marginHorizontal: 10,
+                  alignItems: 'center',
+                }}
+              >
+                <Image
+                  source={require('../../image/doge_logo.png')}
+                  style={{ width: 35, height: 35, marginLeft: 20 }}
+                />
+
+                <View style={{ marginLeft: 10, flex: 1 }}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>DOGE</Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        marginLeft: 5,
+                        backgroundColor: '#F5F7F9',
+                        paddingHorizontal: 5,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 5,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: '#666',
+                          fontSize: 10,
+                          textAlign: 'center',
+                        }}
+                      >
+                        DOGE
+                      </Text>
+                    </View>
+                  </View>
+                  <Text
+                    style={{ marginTop: 5, fontSize: 10, color: '#666' }}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {dogeAddress}
+                  </Text>
+                </View>
+
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    const dogeAddress = await metaletWallet.currentDogeWallet.getAddress();
+                    ShowNotice(dogeAddress);
+                  }}
+                >
+                  <Image
+                    source={require('../../image/meta_copy_icon.png')}
+                    style={{ width: 20, height: 20, marginRight: 10 }}
+                  />
+                </TouchableWithoutFeedback>
+              </View>
+
               {/* over */}
             </View>
           </View>
@@ -1019,7 +1089,7 @@ export default function ChatWalletPage({ navigation }) {
             (netWork == network_all && (
               <TouchableWithoutFeedback
                 onPress={() => {
-                  navigate('NetWorkPage');
+                  // navigate('NetWorkPage');
                 }}
               >
                 <Image
@@ -1050,6 +1120,19 @@ export default function ChatWalletPage({ navigation }) {
             >
               <Image
                 source={require('../../image/logo_space.png')}
+                style={{ width: 24, height: 24 }}
+              />
+            </TouchableWithoutFeedback>
+          )}
+
+          {netWork == network_doge && (
+            <TouchableWithoutFeedback
+              onPress={() => {
+                navigate('NetWorkPage');
+              }}
+            >
+              <Image
+                source={require('../../image/doge_logo.png')}
                 style={{ width: 24, height: 24 }}
               />
             </TouchableWithoutFeedback>
@@ -1137,6 +1220,8 @@ export default function ChatWalletPage({ navigation }) {
                   navigate('SendBtcPage');
                 } else if (netWork == network_all) {
                   navigate('SendSelectAssertPage');
+                } else if (netWork == network_doge) {
+                  navigate('SendDogePage');
                 }
               }}
             >
@@ -1159,6 +1244,8 @@ export default function ChatWalletPage({ navigation }) {
                   navigate('ReceivePage', { myCoinType: 'SPACE' });
                 } else if (netWork == network_btc) {
                   navigate('ReceivePage', { myCoinType: 'BTC' });
+                } else if (netWork == network_doge) {
+                  navigate('ReceivePage', { myCoinType: 'DOGE' });
                 } else if (netWork == network_all) {
                   navigate('SelectReceivePage');
                 }
@@ -1174,6 +1261,7 @@ export default function ChatWalletPage({ navigation }) {
                 </Text>
               </View>
             </TouchableWithoutFeedback>
+
             {/* 
           <TouchableWithoutFeedback
             onPress={() => {
@@ -1223,7 +1311,6 @@ export default function ChatWalletPage({ navigation }) {
                 <TouchableWithoutFeedback
                   onPress={async () => {
                     // navigate("DiscoverPage");
-
                     navigate('WebsPage', {
                       // url: "https://octopus.space/",
                       url: 'https://octopus.space/#/wrapping',
@@ -1255,6 +1342,8 @@ export default function ChatWalletPage({ navigation }) {
           {netWork == network_btc && <MyTabs02 />}
 
           {netWork == network_mvc && <MyTabs03 />}
+          
+          {netWork == network_doge && <MyTabs03 />}
         </View>
       </View>
       {/* </ImageBackground> */}

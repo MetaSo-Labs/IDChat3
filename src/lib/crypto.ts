@@ -149,6 +149,7 @@ export const signTransaction = async (
     };
   }
 
+  console.log("tx.id:", tx.id.toString());
   return {
     publicKey: publicKey.toString(),
     r: sig.r.toString("hex"),

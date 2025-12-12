@@ -52,6 +52,7 @@ import { account_switch, isLogin_event, logout_event, refresh_event } from '../c
 import { isUserLogin } from '../com/metaIDUtils';
 import { getStorageCurrentWallet } from '@/utils/WalletUtils';
 import * as Notifications from 'expo-notifications';
+import { sleep } from '@/lib/helpers';
 
 interface Message {
   host: string;
@@ -61,7 +62,7 @@ interface Message {
   params: Record<string, unknown>;
   action: `${string}-${ActionType}`;
 }
-export default function DappWebsPage(props) {
+export default function OpenWebsPage(props) {
   const { setCurrentWallet } = useWalletStore();
   const { metaletWallet, updateMetaletWallet } = useData();
   const { needInitWallet, updateNeedInitWallet } = useData();
@@ -72,6 +73,9 @@ export default function DappWebsPage(props) {
   const url = props.route.params.url;
   const [uri, setURI] = useState(url);
   const [currentUrl, setCurrentUrl] = useState(url);
+  // const [lastUrl, setLastUrl] = useState('');
+  const [lastMainUrl, setLastMainUrl] = useState<string | null>(null);
+
   const [uriReady, setReadyURI] = useState('');
   const [icon, setIcon] = useState('');
   const [host, setHost] = useState('');
@@ -210,7 +214,7 @@ export default function DappWebsPage(props) {
         }
       }
     } catch (e) {
-      setIsShowLoading(false);
+      // setIsShowLoading(false);
       // alert(e);
       // ToastView({ text: "Please input address", type: "error" });
       ToastView({ text: e.toString(), type: 'error', time: 5000 });
@@ -255,16 +259,18 @@ export default function DappWebsPage(props) {
   };
 
   const handlerMessage = async (message: Message & { type: string; data: unknown }) => {
-    console.log('handlerMessage', JSON.stringify(message));
-
-    if (message.type === 'Console') {
-      console.info(`[Console] ${JSON.stringify(message.data)}`);
-      return;
-    }
+    // console.log('handlerMessage', JSON.stringify(message));
+    // console.log('handlerMessage', JSON.stringify(message));
+    // console.log('handlerMessage', JSON.stringify(message));
+    // await sleep(2000);
+    // if (message.type === 'Console') {
+    //   console.info(`[Console] ${JSON.stringify(message.data)}`);
+    //   return;
+    // }
     let [actionName, actionType] = message.action.split('-');
     // console.log("actionName", actionName);
     // console.log("actionType", actionType);
-    setIsShowLoading(false);
+    // setIsShowLoading(false);
     if (actionName === 'ECDH' || actionName === 'SignBTCMessage' || actionName === 'Connect') {
       actionType = 'query';
     }
@@ -350,7 +356,7 @@ export default function DappWebsPage(props) {
       <SafeAreaView style={{ flex: 1 }}>
         <LoadingModal
           isShow={isShowLoading}
-          isCancel={true}
+          isCancel={false}
           event={() => {
             setIsShowLoading(false);
           }}
@@ -635,14 +641,12 @@ export default function DappWebsPage(props) {
           </View>
         </Modal>
 
-
-
         <View
           style={{
-            flexDirection: "row",
+            flexDirection: 'row',
             padding: 10,
-            alignItems: "center",
-            backgroundColor: "#fff",
+            alignItems: 'center',
+            backgroundColor: '#fff',
           }}
         >
           <TouchableWithoutFeedback
@@ -651,7 +655,7 @@ export default function DappWebsPage(props) {
             }}
           >
             <Image
-              source={require("@image/meta_back_icon.png")}
+              source={require('@image/meta_back_icon.png')}
               style={{ width: 22, height: 22 }}
             />
           </TouchableWithoutFeedback>
@@ -667,7 +671,7 @@ export default function DappWebsPage(props) {
         >
           {uri}
         </Text> */}
-
+          {/* 
           <TextInput
             style={{
               backgroundColor: litterWhittleBgColor,
@@ -683,6 +687,12 @@ export default function DappWebsPage(props) {
               setIsFocusEdit(true);
             }}
             onChangeText={(text) => setReadyURI(text)}
+          /> */}
+
+          <View
+            style={{
+              flex: 1,
+            }}
           />
 
           <TouchableOpacity
@@ -690,7 +700,7 @@ export default function DappWebsPage(props) {
               if (isFocusEdit == false) {
                 if (webViewRef.current) webViewRef.current.reload();
               } else {
-                console.log("uriReady进入加载");
+                console.log('uriReady进入加载');
                 setIsFocusEdit(false);
                 Keyboard.dismiss();
 
@@ -717,24 +727,24 @@ export default function DappWebsPage(props) {
             }}
             style={{
               borderWidth: 1, // 设置边框宽度为1
-              borderColor: "#E7E7E7", // 设置边框颜色为 #E7E7E7
+              borderColor: '#E7E7E7', // 设置边框颜色为 #E7E7E7
               borderRadius: 50, // 圆形边角，h和w的大小决定了其形状
               width: 32, // 对应 w-8，8 * 4px = 32px
               height: 32, // 对应 h-8，8 * 4px = 32px
-              flexDirection: "row", // 使用 flex 排列元素
-              alignItems: "center", // 垂直居中对齐
-              justifyContent: "center",
+              flexDirection: 'row', // 使用 flex 排列元素
+              alignItems: 'center', // 垂直居中对齐
+              justifyContent: 'center',
               marginLeft: 5, // 水平居中对齐
             }}
           >
             {isFocusEdit === true ? (
               <Image
-                source={require("@image/meta_search_icon.png")}
+                source={require('@image/meta_search_icon.png')}
                 style={{ width: 16, height: 16 }}
               />
             ) : (
               <Image
-                source={require("@image/icon_refresh.png")}
+                source={require('@image/icon_refresh.png')}
                 style={{ width: 16, height: 16 }}
               />
             )}
@@ -751,13 +761,13 @@ export default function DappWebsPage(props) {
             style={{
               marginLeft: 5,
               borderWidth: 1, // 设置边框宽度为1
-              borderColor: "#E7E7E7", // 设置边框颜色为 #E7E7E7
+              borderColor: '#E7E7E7', // 设置边框颜色为 #E7E7E7
               borderRadius: 50, // 圆形边角，h和w的大小决定了其形状
               width: 32, // 对应 w-8，8 * 4px = 32px
               height: 32, // 对应 h-8，8 * 4px = 32px
-              flexDirection: "row", // 使用 flex 排列元素
-              alignItems: "center", // 垂直居中对齐
-              justifyContent: "center", // 水平居中对齐
+              flexDirection: 'row', // 使用 flex 排列元素
+              alignItems: 'center', // 垂直居中对齐
+              justifyContent: 'center', // 水平居中对齐
             }}
           >
             {/* <CloseIcon
@@ -770,7 +780,7 @@ export default function DappWebsPage(props) {
             /> */}
 
             <Image
-              source={require("@image/metalet_close_big_icon.png")}
+              source={require('@image/metalet_close_big_icon.png')}
               style={{ width: 13, height: 13 }}
             />
           </TouchableOpacity>
@@ -827,21 +837,57 @@ export default function DappWebsPage(props) {
               onLoadStart={() => console.log('WebView start')}
               onLoadEnd={() => {
                 console.log('WebView end');
-                setIsShowLoading(false);
+                // setIsShowLoading(false);
 
                 // sendWebMessage({ isLogin: true });
                 // const address = await getMvcAddress();
                 // console.log('address', address);
+
+                // setTimeout(() => {
+                  setIsShowLoading(false);
+                // }, 10000);
               }}
               // cacheMode="LOAD_CACHE_ELSE_NETWORK"
               javaScriptCanOpenWindowsAutomatically={true}
-              onMessage={(e) => {
+              onMessage={async (e) => {
                 handlerMessage(JSON.parse(e.nativeEvent.data));
               }}
               userAgent={Platform.OS === 'ios' ? 'IDChat-iOS' : 'IDChat-Android'}
               androidHardwareAccelerationDisabled={false}
               onNavigationStateChange={handleNavigationStateChange}
               originWhitelist={['*']}
+              // onShouldStartLoadWithRequest={(request) => {
+              //   let curUrl = request.url;
+
+              //   // 自动把 http 升级为 https
+              //   if (curUrl.startsWith('http://')) {
+              //     curUrl = curUrl.replace('http://', 'https://');
+              //   }
+
+              //   const isMain = request.mainDocumentURL === request.url;
+              //   const isAboutBlank = request.url.startsWith('about:blank');
+
+              //   // always allow about:blank
+              //   if (isAboutBlank) return true;
+
+              //   // allow first main document
+              //   if (!lastMainUrl && isMain) {
+              //     setLastMainUrl(curUrl);
+              //     console.log('首次主页面加载:', curUrl);
+              //     return true;
+              //   }
+
+              //   // allow main page navigation if URL 不完全相同
+              //   if (isMain) {
+              //     if (curUrl === lastMainUrl) {
+              //       console.log('重复主页面加载阻止:', curUrl);
+              //       return false; // 阻止重复加载
+              //     } else {
+              //       setLastMainUrl(curUrl);
+              //       return true;
+              //     }
+              //   }
+              // }}
             />
           </View>
         )}

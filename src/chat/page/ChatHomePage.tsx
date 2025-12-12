@@ -42,7 +42,12 @@ import * as ECDH from '@/webs/actions/common/ecdh';
 import { useTranslation } from 'react-i18next';
 import { Line } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AsyncStorageUtil, createStorage, no_notice_key } from '@/utils/AsyncStorageUtil';
+import {
+  AsyncStorageUtil,
+  createStorage,
+  no_notice_key,
+  wallet_language_key,
+} from '@/utils/AsyncStorageUtil';
 import { useFocusEffect } from '@react-navigation/native';
 import { ActionType } from '@/webs/actions/types';
 import { injectedJavaScript } from '@/webs/inject';
@@ -54,6 +59,7 @@ import {
   account_switch,
   isLogin_event,
   logout_event,
+  on_language_change,
   refresh_event,
   tab_change_event,
 } from '../com/chatActions';
@@ -68,6 +74,11 @@ import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { UpdateData } from '@/api/type/Update';
 import { fetchCheckUpgrade } from '@/api/metaletservice';
+import i18n from '@/language/i18n';
+import { Portal } from 'react-native-paper';
+import { sleep } from '@/lib/helpers';
+import { DogeCoinWallet, getDogeCoinWallet } from '../wallet/doge/DogeCoinWallet';
+import * as getPKHByPath from '@/webs/actions/lib/query/get-pkh-by-path';
 
 interface Message {
   host: string;
@@ -88,8 +99,11 @@ export default function ChatHomePage() {
   const webViewRef = useRef(null);
   const url = 'https://www.idchat.io/chat';
   // const url = 'https://testchat.show.now/';
+  const currentUrl = useRef(url);
   const [uri, setURI] = useState(url);
   const [uriReady, setReadyURI] = useState('');
+  const { walletLanguage, updateWalletLanguage } = useData();
+
   const [icon, setIcon] = useState('');
   const [host, setHost] = useState('');
   const [actionName, setActionName] = useState('');
@@ -132,6 +146,7 @@ export default function ChatHomePage() {
     initChatWallet();
     initIsBackUp();
     requestBadgePermission();
+    changeLanguage();
 
     const sub = Notifications.addNotificationReceivedListener(async () => {
       const count = await Notifications.getBadgeCountAsync();
@@ -145,7 +160,14 @@ export default function ChatHomePage() {
     // initCurrentWallet();
     console.log('HomePage switchAccount ');
     byAccountSwitch();
+    if (isNeedRefreshWebRef.current) byRefresh();
   }, [switchAccount]);
+
+  useEffect(() => {
+    // console.log("HomePage needInitWallet ");
+    // initCurrentWallet();
+    onLanguageChange();
+  }, [walletLanguage]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -167,7 +189,7 @@ export default function ChatHomePage() {
       if (appState.match(/background|inactive/) && nextState === 'active') {
         // 👇 这里就是「从后台重新回到前台」的时机
         console.log('App has come to the foreground!');
-        if (isNeedRefreshWebRef.current ) byRefresh();
+        if (isNeedRefreshWebRef.current) byRefresh();
         // 例如：重新请求数据、刷新 UI 等
       }
 
@@ -178,9 +200,11 @@ export default function ChatHomePage() {
   }, [appState]);
 
   useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextState) => {
+    const subscription = AppState.addEventListener('change', async (nextState) => {
       if (appStateRef.current.match(/background|inactive/) && nextState === 'active') {
         console.log('读取到的：' + isNeedRefreshWebRef.current);
+        await sleep(3000);
+
         if (isNeedRefreshWebRef.current) {
           updateReloadKey((k) => {
             const next = getRandomNum();
@@ -215,8 +239,10 @@ export default function ChatHomePage() {
     byLogOut();
   }, [webLogout]);
 
-  /////////////////////////////////init/////////////////
+  /////////////////////////////////init/////////////////////////////
   async function initChatWallet() {
+    const pubk = await getPKHByPath.process({ path: 'm/100/0' }, { password: '' });
+    console.log('通过路径获取的PKH：' + pubk);
     const baseWallet: BaseWalletTools = await initBaseChatWallet();
     console.log('baseWallet', baseWallet.currentBtcWallet.getAddress());
     console.log('baseWallet', baseWallet.currentMvcWallet.getAddress());
@@ -261,19 +287,29 @@ export default function ChatHomePage() {
     console.log('Notification settings', settings);
   }
 
+  const changeLanguage = async () => {
+    // const newLanguage = i18n.language === 'en' ? 'zh' : 'en';
+    const newLanguage = await AsyncStorageUtil.getItemDefault(wallet_language_key, 'en');
+    i18n.changeLanguage(newLanguage); // 切换语言
+    updateWalletLanguage(newLanguage);
+  };
+
   //////////////////////////web function////////////////////////////////////////////////
   async function byLogin() {
     const isLogin = await isUserLogin();
+    const address = metaletWallet.currentMvcWallet.getAddress();
+
     if (isLogin) {
-      console.log('in byLogin 发送登录', isLogin);
+      console.log('in byLogin 发送登录', address);
       sendWebMessage(isLogin_event, { isLogin: true });
     }
   }
 
   async function byLogOut() {
     const isLogin = await isUserLogin();
+    const address = metaletWallet.currentMvcWallet.getAddress();
     if (isLogin) {
-      console.log('in  发送退出登录', logout_event);
+      console.log('in  发送退出登录', logout_event + address);
       sendWebMessage(logout_event, { isLogin: false });
     }
   }
@@ -305,6 +341,26 @@ export default function ChatHomePage() {
     }
   }
 
+  async function onLanguageChange() {
+    const isLogin = await isUserLogin();
+    if (isLogin) {
+      const newLanguage = await AsyncStorageUtil.getItemDefault(wallet_language_key, 'en');
+      console.log(
+        '发送切换语言：                                                                                                                       in onLanguageChange',
+        newLanguage,
+      );
+      sendWebMessage(on_language_change, newLanguage);
+    }
+
+    // const dogeWallet = await getDogeCoinWallet();
+    // const dogeAddress = await dogeWallet.getAddress();
+    // console.log('walletAddress : ' + dogeAddress);
+    // const hexTx = await dogeWallet.buildAndSignTx('DAk4Uq7pKhvcg4J3vwRYSkUc9FJeFxpNsn', 0.3);
+    // const result = dogeWallet.broadcastTx(hexTx);
+    // console.log('TxID : ' + JSON.stringify(result));
+
+  }
+
   //webs
   const cancelAction = async () => {
     postMessage(
@@ -323,6 +379,7 @@ export default function ChatHomePage() {
     setCanGoBack(navState.canGoBack);
     setReadyURI(navState.url);
     setURI(navState.url);
+    currentUrl.current = navState.url;
   };
 
   const confirmAction = async () => {
@@ -354,19 +411,28 @@ export default function ChatHomePage() {
           // console.log("params 设置参数完成：", params);
           setIsShowLoading(false);
         } catch (e) {
-          console.log('调用报错' + e);
-          setModalVisible(false);
-          ToastView({ text: e.toString(), type: 'error', time: 3000 });
-          // cancelAction();
-          errorAction(e.toString());
-          throw e.toString();
+          if (actionName === 'Inscribe') {
+            console.log('调用报错11:' + actionName + e);
+            setModalVisible(false);
+            ToastView({ text: 'Insufficient funds', type: 'error', time: 3000 });
+            // cancelAction();
+            errorAction('Insufficient funds.');
+            throw 'Insufficient funds';
+          } else {
+            console.log('调用报错:' + actionName + e);
+            setModalVisible(false);
+            ToastView({ text: e.toString(), type: 'error', time: 3000 });
+            // cancelAction();
+            errorAction(e.toString());
+            throw e.toString();
+          }
         }
       } else {
         try {
-          // console.log("进行下一步处理", actionName);
+          console.log('进行下一步处理', actionName);
           const { process } = actionDispatcher(actionName, actionType as ActionType);
           // console.log("confirmAction params", componentInfo.params);
-          // console.log("actionName 执行4444 ", componentInfo.params);
+          console.log('actionName 执行4444 ', componentInfo.params);
           const data = await process(componentInfo.params, actionMsg.host);
           setIsShowLoading(false);
 
@@ -421,8 +487,6 @@ export default function ChatHomePage() {
   };
 
   const onError = ({ nativeEvent }) => {
-    console.log('webView 加载错误信息');
-
     console.log('onError', nativeEvent);
   };
   const postMessage = async (message: unknown) => {
@@ -434,15 +498,24 @@ export default function ChatHomePage() {
   const handlerMessage = async (message: Message & { type: string; data: unknown }) => {
     // console.log('handlerMessage', JSON.stringify(message));
 
-    if (message.type === 'Console') {
-      // console.info(`[Console] ${JSON.stringify(message.data)}`);
-      return;
-    }
+    // if (message.type === 'Console') {
+    //   console.info(`[Console] ${JSON.stringify(message.data)}`);
+    //   return;
+    // }
+
     let [actionName, actionType] = message.action.split('-');
 
     if (actionName === 'SetAppBadge') {
-      const count = message.params.num as number;
-      await Notifications.setBadgeCountAsync(count);
+      // Ensure count is a number
+      const count =
+        typeof message.params === 'number'
+          ? message.params
+          : typeof message.params?.count === 'number'
+            ? message.params.count
+            : 0;
+      console.log('设置角标onSetAppBadge: ' + count);
+
+      // await Notifications.setBadgeCountAsync(count);
     }
 
     if (actionName === 'NeedWebRefresh') {
@@ -450,6 +523,21 @@ export default function ChatHomePage() {
       updateNeedWebRefresh(message.params.isNeed);
       isNeedRefreshWebRef.current = message.params.isNeed as boolean;
     }
+
+    if (actionName === 'OpenAppBrowser') {
+      console.log('openAppBrowser: 链接: ' + message.params.url);
+      navigate('OpenWebsPage', { url: message.params.url });
+      return;
+    }
+
+    //   if (currentUrl.current.includes('idchat.io')) return true;
+
+    //   if (!isNavigating.current) {
+    //     isNavigating.current = true;
+    //     navigate('DappWebsPage', { url: request.url });
+    //     setTimeout(() => (isNavigating.current = false), 1000);
+    //   }
+    //   return false;
 
     // console.log("actionName", actionName);
     // console.log("actionType", actionType);
@@ -466,7 +554,7 @@ export default function ChatHomePage() {
     // console.log("actionMsg2 执行111 ", JSON.stringify(actionMsg2));
 
     if (actionType === ActionType.Authorize) {
-      // console.log("actionMsg2 执行222 " + actionName);
+      console.log('actionMsg2 执行222 ' + actionName);
 
       // console.log("message", message);
       setActionMsg(message);
@@ -479,13 +567,7 @@ export default function ChatHomePage() {
         actionName,
         actionType,
       );
-      // console.log(
-      //   "actionMsg2 执行333 ",
-      //   title,
-      //   descriptions,
-      //   component,
-      //   needEstimated
-      // );
+
       setActionName(title);
       setComponentInfo({ component, params: message.params });
       setDescriptions(descriptions);
@@ -524,6 +606,7 @@ export default function ChatHomePage() {
       }
     }
   };
+  const isNavigating = useRef(false);
 
   return (
     <TouchableWithoutFeedback
@@ -726,7 +809,6 @@ export default function ChatHomePage() {
                 {t('n_web_response_title')}
               </Text>
               <Line />
-              {/* metaStyles.defaultText, */}
               <ScrollView>
                 <Text
                   style={[
@@ -776,7 +858,6 @@ export default function ChatHomePage() {
                   </TouchableWithoutFeedback>
                 )}
 
-                {/* <Image  style={{width:15}} source={require("../../image/metalet_wallet_check_normal_icom.png")} /> */}
                 <Text style={[metaStyles.defaultText, { marginTop: 0 }]}>
                   {t('n_web_response_confirm')}
                 </Text>
@@ -882,6 +963,34 @@ export default function ChatHomePage() {
               androidHardwareAccelerationDisabled={false}
               onNavigationStateChange={handleNavigationStateChange}
               originWhitelist={['*']}
+              // onShouldStartLoadWithRequest={(request) => {
+              //   console.log('即将加载的链接:', request.url);
+              //   console.log('当前链接是：', currentUrl.current);
+
+              //   if (currentUrl.current.includes('idchat.io')) return true;
+
+              //   if (!isNavigating.current) {
+              //     isNavigating.current = true;
+              //     navigate('DappWebsPage', { url: request.url });
+              //     setTimeout(() => (isNavigating.current = false), 1000);
+              //   }
+              //   return false;
+              //             if (currentUrl.current.includes('idchat.io')) {
+              //               return true;
+              //             } else {
+              //               if (!isNavigating.current) {
+              //   isNavigating.current = true;
+              //   setTimeout(() => (isNavigating.current = false), 1000);
+              //   navigate('DappWebsPage', { url: request.url });
+              // }
+              //               console.log('in handleNavigationStateChange', request.url);
+              //               navigate('DappWebsPage', { url: request.url });
+              //               // navigate('WebViewPage', {
+              //               //   url: request.url,
+              //               // });
+              //               return false; // 阻止加载
+              //             }
+              // }}
             />
           </View>
         )}

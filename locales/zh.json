@@ -138,5 +138,12 @@
   "chat_settings_add_account": "添加账号",
   "chat_current_account": "当前账号",
   "s_backup_chat": "备份助记词",
-  "copy_success": "复制成功"
+  "copy_success": "复制成功",
+  "pro_feed_back": "问题与反馈",
+  "pro_input_normal": "请输入您想反馈的问题",
+  "community_reminder": "用户行为规范提示",
+  "community_reminder_notice_first": "为维护健康、安全的交流环境，请文明发言，避免发布违法、违规或令人不适的内容。若您发现任何不当内容或行为，可在【设置】-【意见反馈】中提交，或发送邮件至",
+  "community_reminder_notice_last": "  我们的开发团队将会在 24 小时内进行核查与处理。",
+  "comm_my_know": "我已知晓",
+  "comm_email_us": "devs@idchat.io."
 }

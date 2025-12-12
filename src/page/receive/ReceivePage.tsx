@@ -22,6 +22,7 @@ export default function ReceivePage({ route }) {
   const { myCoinType } = route.params;
   const { btcAddress, updateBtcAddress } = useData();
   const { mvcAddress, updateMvcAddress } = useData();
+  const { dogeAddress, updateDogeAddress } = useData();
   const { t } = useTranslation();
 
   function ShowNotice(notice) {
@@ -216,6 +217,95 @@ export default function ReceivePage({ route }) {
             </TouchableWithoutFeedback>
           </View>
         )}
+
+
+          {myCoinType == "DOGE" && (
+          <View
+            style={{
+              justifyContent: "center",
+              backgroundColor: "#fff",
+              margin: 20,
+              borderRadius: 10,
+              alignItems: "center",
+              padding: 20,
+            }}
+          >
+         
+
+            {myCoinType == "DOGE" && (
+              <Image
+                source={require("../../../image/doge_logo.png")}
+                style={{ width: 70, height: 70 }}
+              />
+            )}
+
+            <Text
+              style={{
+                color: "#333",
+                textAlign: "center",
+                lineHeight: 20,
+                marginTop: 40,
+                fontSize: 18,
+                fontWeight: "bold",
+              }}
+            >
+              DOGE
+            </Text>
+
+            <Text
+              style={{
+                color: "#666",
+                textAlign: "center",
+                lineHeight: 20,
+                marginTop: 20,
+                fontSize: 14,
+              }}
+            >
+              {t("o_receive_mvc_notice")}
+            </Text>
+
+            <View style={{ marginTop: 40 }}>
+              {/* <MyQrCode qrData={metaletWallet.currentMvcWallet.getAddress()} size={width - 130} /> */}
+              <MyQrCode qrData={metaletWallet.currentDogeWallet.address} size={width - 130} />
+            </View>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                //   Clipboard.setString("Address");
+                ShowNotice(metaletWallet.currentDogeWallet.address);
+                // ShowNotice(dogeAddress);
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  marginTop: 40,
+                  marginBottom: 20,
+                  marginHorizontal: 30,
+                  borderWidth: 1,
+                  borderColor: "rgba(191, 194, 204, 0.5)",
+                  borderRadius: 5,
+                  paddingHorizontal: 20,
+                  paddingVertical: 10,
+                }}
+              >
+                <Text numberOfLines={1} ellipsizeMode="middle">
+                  {/* {metaletWallet.currentMvcWallet.getAddress()} */}
+                  {dogeAddress}
+                </Text>
+
+                <View style={{ flex: 1 }} />
+
+                <Image
+                  source={require("../../../image/meta_copy_icon.png")}
+                  style={{ width: 20, height: 20, marginLeft: 20 }}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        )}
+
+
+
       </View>
     </SafeAreaView>
   );

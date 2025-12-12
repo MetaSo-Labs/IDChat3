@@ -49,6 +49,8 @@ export default function SwitchAccountPage() {
   const { switchAccount, updateSwitchAccount } = useData();
   const { webLogout, updateWebLogout } = useData();
 
+  let [isEdit, setIsEdit] = useState(false);
+
   useEffect(() => {
     getWalletData();
   }, []);
@@ -148,8 +150,28 @@ export default function SwitchAccountPage() {
 
           <View style={{ flex: 1 }} />
 
-          {currentWalletID == item.id && (
+          {currentWalletID == item.id && isEdit == false && (
             <Text style={{ fontSize: 10, color: '#1AE29C' }}>{t('chat_current_account')}</Text>
+          )}
+
+          {isEdit && (
+            <TouchableWithoutFeedback
+              onPress={() => {
+                // setParentIndex(parentIndex);
+                // setIsShowEditAccount(true);
+                // setAccountIndex(index);
+                // setChangeAccountName(item.name);
+                // setEditWalletName(item.name);
+                // setIsShowEditWallet(true);
+                setIsEdit(false);
+                navigate('DeleteIDChatPage', { postion: index });
+              }}
+            >
+              <Image
+                source={require('@image/metalet_delete_icon.png')}
+                style={{ marginRight: 15, width: 15, height: 15 }}
+              />
+            </TouchableWithoutFeedback>
           )}
         </View>
       </TouchableWithoutFeedback>
@@ -310,7 +332,14 @@ export default function SwitchAccountPage() {
       </Modal>
 
       <View style={{ flex: 1 }}>
-        <TitleBar title={t('s_backup_wallet')} />
+        <TitleBar
+          title={t('s_backup_wallet')}
+          left={t('o_wallet_edit')}
+          leftEvent={() => {
+            setIsEdit(isEdit != true ? true : false);
+            console.log('点击了编辑按钮');
+          }}
+        />
         <View style={{ flex: 1 }}>
           <FlatList
             style={{ marginTop: 20, flex: 1, marginBottom: 100 }}

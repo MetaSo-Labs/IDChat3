@@ -462,7 +462,13 @@ const actions = {
   autoPaymentStatus: { action: "AutoPaymentStatus", type: "query" },
   autoPayment: { action: "AutoPayment", type: "authorize" },
   setAppBadge: { action: "SetAppBadge", type: "query" },
-  needWebRefresh:{ action: "NeedWebRefresh", type: "query" }
+  needWebRefresh:{ action: "NeedWebRefresh", type: "query" },
+  openAppBrowser:{ action: "OpenAppBrowser", type: "query" },
+  getAppVersionCode:{ action: "GetAppVersionCode", type: "query" },
+  getPKHByPath:{ action: "GetPKHByPath", type: "query" },
+  signTransaction:{ action: "SignTransaction", type: "authorize" },
+  eciesDecrypt:{ action: "EciesDecrypt", type: "authorize" },
+  eciesEncrypt:{ action: "EciesEncrypt", type: "authorize" },
 };
 
 const metalet = { btc: {}, token: {} ,common: {} };
@@ -537,6 +543,7 @@ Object.keys(tokenKeys).forEach((type) => {
 
 
 window.metaidwallet = metalet;
+window.metaidwallet.version= 21;
 
 const consoleLog = (type, log) => window.ReactNativeWebView.postMessage(JSON.stringify({'type': 'Console', 'data': {'type': type, 'log': log}}));
 console = {

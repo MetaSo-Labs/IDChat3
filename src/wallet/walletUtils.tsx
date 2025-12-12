@@ -90,9 +90,9 @@ export async function getECDHData(
     // console.log("privateKey", privateKey.toString("hex"));
     console.log('externalPubKey', externalPubKey);
     // 验证 externalPubKey 格式
-    if (!externalPubKey.startsWith('04') || externalPubKey.length !== 130) {
-      throw new Error('Invalid externalPubKey format. Expected uncompressed public key.');
-    }
+    // if (!externalPubKey.startsWith('04') || externalPubKey.length !== 130) {
+    //   throw new Error('Invalid externalPubKey format. Expected uncompressed public key.');
+    // }
 
     // const _externalPubKey = Buffer.from(externalPubKey, "hex");
     // const ec = new elliptic.ec("secp256k1");

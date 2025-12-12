@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Linking,
+  Modal,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { metaStyles, themeColor } from '../constant/Constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from 'react-native-paper';
@@ -23,15 +24,16 @@ import {
   openBrowser,
   // openLocalPrivacyPolsicy,
 } from '../utils/WalletUtils';
-import { wordlist } from '@scure/bip39/wordlists/english';
 import * as bip39 from '@scure/bip39';
 import { useData } from '../hooks/MyProvider';
 import { createMetaletWallet } from '../wallet/wallet';
 import MetaletWallet from '../wallet/MetaletWallet';
 import {
+  AsyncStorageUtil,
   createStorage,
   CurrentAccountIDKey,
   CurrentWalletIDKey,
+  USER_NOTICE_KEY,
   wallet_mode_hot,
   wallets_key,
 } from '../utils/AsyncStorageUtil';
@@ -63,10 +65,28 @@ export default function WelcomeWalletPage(props) {
   const { t } = useTranslation();
   const { setCurrentWallet } = useWalletStore();
   const { webLogout, updateWebLogout } = useData();
+  const [showNotice, setShowNotice] = useState(false);
+
+  useEffect(() => {
+    console.log('WelcomeWalletPage useEffect');
+
+    checkUserNotice();
+  }, []);
+
+  async function checkUserNotice() {
+    const isShow = await AsyncStorageUtil.getItemDefault(USER_NOTICE_KEY, true);
+    if (isShow) {
+      setShowNotice(true);
+    } else {
+      setShowNotice(false);
+    }
+  }
 
   async function createWallet() {
     setIsShowLoading(true);
+
     const { btcWallet, mvcWallet, walletBean } = await createMetaletWallet(10001, wallet_mode_hot);
+
     const wallets = await getStorageWallets();
     const hasNoWallets = await isNoStorageWallet();
 
@@ -96,7 +116,72 @@ export default function WelcomeWalletPage(props) {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: themeColor }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: themeColor, flex: 1 }]}>
+      <Modal visible={false} transparent animationType="fade">
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: 20,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: 16,
+              paddingHorizontal: 35,
+              paddingTop: 35,
+              paddingBottom: 33,
+              width: '90%',
+              maxWidth: 400,
+            }}
+          >
+            <View style={{ flexDirection: 'row', marginBottom: 12 }}>
+              <Text style={{ fontSize: 18, fontWeight: '700' }}>{t('community_reminder')}</Text>
+
+              {/* <TouchableWithoutFeedback
+                onPress={() => {
+                  setShowNotice(false);
+                }}
+              >
+                <Image
+                  source={require('@image/metalet_close_big_icon.png')}
+                  style={{ width: 20, height: 20, marginLeft: 'auto' }}
+                />
+              </TouchableWithoutFeedback> */}
+            </View>
+            {/* <Text style={{ fontSize: 15, color: '#333', lineHeight: 22, marginTop: 5 }}>
+              {t('community_reminder_notice')}
+            </Text> */}
+            <Text style={{ fontSize: 15, color: '#333', lineHeight: 22, marginTop: 5 }}>
+              {t('community_reminder_notice_first')}{' '}
+              <Text style={{ fontWeight: '600' }}>{t('comm_email_us')}</Text>{' '}
+              {t('community_reminder_notice_last')}
+            </Text>
+
+            <TouchableOpacity
+              onPress={async () => {
+                setShowNotice(false);
+                await AsyncStorageUtil.setItem(USER_NOTICE_KEY, false);
+              }}
+              style={{
+                marginTop: 22,
+                backgroundColor: themeColor,
+                borderRadius: 10,
+                paddingVertical: 10,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ color: '#333', fontWeight: '500', fontSize: 16 }}>
+                {t('comm_my_know')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <LoadingModal
         isShow={isShowLoading}
         isCancel={true}
@@ -136,6 +221,7 @@ export default function WelcomeWalletPage(props) {
             //   eventBus.publish(logout_Bus, { data: '' });
             //   updateWebLogout(getRandomID)
             // }
+            console.log('create 进入');
             createWallet();
           }
         }}
@@ -174,7 +260,7 @@ export default function WelcomeWalletPage(props) {
             navigate('SetPasswordPage', { type: 'import' });
           } else {
             // navigate("ImportWalletPage", { destory: true });
-            navigate('ImportWalletNetPage', { type: wallet_mode_hot });
+            navigate('ImportWalletNetNewPage', { type: wallet_mode_hot });
           }
         }}
       >

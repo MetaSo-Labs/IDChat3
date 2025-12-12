@@ -29,7 +29,7 @@
   "s_version": "Version",
   "s_terms_of_service": "Terms of Service",
   "s_privacy_policy": "Privacy Policy",
-  "s_official": "Go to the official website to learn move.",
+  "s_official": "Go to the official website to learn more.",
   "s_cold_wallet": "Cold Wallet",
   "s_cold_guide:": " Cold Wallet Guide:",
   "s_cold_wallet_notice": "1.Create or restore a wallet on an offline phone.\n2.Use another phone connected to the internet to install the wallet and scan the QR code on the asset page of the offline phone to create a watch-only wallet.\n3.The watch-only wallet can currently only view assets. To make transfers, you can import the wallet into an online wallet.",
@@ -138,5 +138,17 @@
   "chat_settings_add_account": "Add Account",
   "chat_current_account": "Current",
   "s_backup_chat": "Backup Mnemonic",
-  "copy_success": "Copy Successfully"
+  "copy_success": "Copy Successfully",
+  "pro_feed_back": "Feedback",
+  "pro_input_normal": "Please enter the problem you want to feedback",
+  "delete_idchat_title": "Confirm To Delete IDChat",
+  "delete_idchat_notice": "Deleting IDChat will remove it from the application. You can restore it anytime by re-importing with your backup mnemonic. Please ensure you've backed up your IDChat before deleting, or your account and assets will be permanently lost.",
+  "community_reminder": "Community Reminder",
+  "community_reminder_notice_first": "Please communicate respectfully and follow our community guidelines while using this app.If you come across any inappropriate behavior or content, Please let us know by going to Settings → Feedback, or send an email to",
+  "community_reminder_notice_last": "Our team will review and take appropriate action within 24 hours.",
+  "comm_my_know": "I already know",
+  "comm_email_us": "devs@idchat.io.",
+
+  "chat_settings_toolkit": "Toolkit"
+
 }

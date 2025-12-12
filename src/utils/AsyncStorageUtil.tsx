@@ -1,4 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface Storage {
   get<T = string>(key: string): Promise<T | undefined | null>;
@@ -31,13 +31,13 @@ export function createStorage(): Storage {
   globalStorage = {
     async get<T>(
       key: string,
-      option?: { defaultValue: T }
+      option?: { defaultValue: T },
     ): Promise<T | string | undefined | null> {
       const value = await storage.get(key);
       if (value === null || value === undefined) {
         return option?.defaultValue;
       }
-      if (typeof value === "string") {
+      if (typeof value === 'string') {
         try {
           return JSON.parse(value) as T;
         } catch (error) {
@@ -47,7 +47,7 @@ export function createStorage(): Storage {
       return value as T;
     },
     async set(key: string, value: object | string) {
-      if (typeof value === "object") {
+      if (typeof value === 'object') {
         value = JSON.stringify(value);
       }
       return await storage.set(key, value);
@@ -60,38 +60,37 @@ export function createStorage(): Storage {
   return globalStorage;
 }
 
-export const wallets_key = "wallets";
-export const account_select_key = "account_select";
-export const network_key = "network";
-export const network_btc = "network_btc";
-export const network_mvc = "network_mvc";
-export const network_all = "network_all";
+export const wallets_key = 'wallets';
+export const account_select_key = 'account_select';
+export const network_key = 'network';
+export const network_btc = 'network_btc';
+export const network_mvc = 'network_mvc';
+export const network_doge = 'network_doge';
+export const network_all = 'network_all';
 
-export const walllet_address_type_key = "walllet_address_type";
+export const walllet_address_type_key = 'walllet_address_type';
 
-export const wallet_password_key = "wallet_password";
-
+export const wallet_password_key = 'wallet_password';
 
 //allow app
-export const settings_allow_small_pay_key = "settings_allow_small_pay_key";
-
-
+export const settings_allow_small_pay_key = 'settings_allow_small_pay_key';
 
 // current
-export const CurrentWalletIDKey = "CurrentWalletID_key";
-export const CurrentAccountIDKey = "CurrentAccountID_key";
+export const CurrentWalletIDKey = 'CurrentWalletID_key';
+export const CurrentAccountIDKey = 'CurrentAccountID_key';
 
-export const net_wallet_network_key = "net_network_key";
-export const no_notice_key="no_notice_key"
+export const net_wallet_network_key = 'net_network_key';
+export const no_notice_key = 'no_notice_key';
 
-export const wallet_mode_key = "wallet_mode_key";
-export const wallet_mode_cold = "cold";
-export const wallet_mode_hot = "hot";
-export const wallet_mode_default = "DefaultMode";
-export const wallet_mode_observer = "observer";
-export const wallet_language_key = "wallet_language_key";
-export const wallet_language_en = "en";
-export const wallet_language_zh = "zh";
+export const wallet_mode_key = 'wallet_mode_key';
+export const wallet_mode_cold = 'cold';
+export const wallet_mode_hot = 'hot';
+export const wallet_mode_default = 'DefaultMode';
+export const wallet_mode_observer = 'observer';
+export const wallet_language_key = 'wallet_language_key';
+export const wallet_language_en = 'en';
+export const wallet_language_zh = 'zh';
+export const USER_NOTICE_KEY = 'user_behavior_notice_shown';
 
 //创建数据
 export const AsyncStorageUtil = {
@@ -108,22 +107,22 @@ export const AsyncStorageUtil = {
       const result = value != null ? JSON.parse(value) : null;
       return result;
     } catch (error) {
-      console.log("key", key);
+      console.log('key', key);
 
-      console.error("Error retrieving data:", error);
+      console.error('Error retrieving data:', error);
       return null;
     }
   },
 
-  async getItemDefault(key,defaultValue) {
+  async getItemDefault(key, defaultValue) {
     try {
       const value = await AsyncStorage.getItem(key);
       const result = value != null ? JSON.parse(value) : defaultValue;
       return result;
     } catch (error) {
-      console.log("key", key);
+      console.log('key', key);
 
-      console.error("Error retrieving data:", error);
+      console.error('Error retrieving data:', error);
       return null;
     }
   },
@@ -151,7 +150,7 @@ export const AsyncStorageUtil = {
       // 更新值
       await AsyncStorage.setItem(key, JSON.stringify(mergedValue));
     } catch (error) {
-      console.error("Error updating data:", error);
+      console.error('Error updating data:', error);
     }
   },
 
@@ -159,7 +158,7 @@ export const AsyncStorageUtil = {
     try {
       await AsyncStorage.clear();
     } catch (error) {
-      console.error("Error clearing data:", error);
+      console.error('Error clearing data:', error);
     }
   },
 };

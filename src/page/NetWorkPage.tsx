@@ -9,6 +9,7 @@ import {
   network_key,
   network_mvc,
   createStorage,
+  network_doge,
 } from "../utils/AsyncStorageUtil";
 import { eventBus, refreshHomeLoadingEvent } from "../utils/EventBus";
 import { navigate } from "../base/NavigationService";
@@ -28,12 +29,17 @@ export default function NetWorkPage() {
     } else if (changeNetwork == network_btc) {
       await storage.set(network_key, network_btc);
       // await AsyncStorageUtil.setItem(network_key, network_btc);
-    } else if (changeNetwork == network_all) {
+    } else if (changeNetwork == network_doge) {
+      await storage.set(network_key, network_doge);
+      // await AsyncStorageUtil.setItem(network_key, network_btc);
+    }  
+    else if (changeNetwork == network_all) {
       await storage.set(network_key, network_all);
       // await AsyncStorageUtil.setItem(network_key, network_all);
     }
     // eventBus.publish(refreshHomeLoadingEvent,{data:''})
     navigate("Tabs");
+    console.log("切换网络成功"+changeNetwork);
     updateNetWork(changeNetwork);
 
     //
@@ -156,6 +162,54 @@ export default function NetWorkPage() {
             )}
           </View>
         </TouchableWithoutFeedback>
+
+        <TouchableWithoutFeedback
+          onPress={() => {
+            changeNetwork(network_doge);
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              marginTop: 25,
+              alignItems: "center",
+              marginHorizontal: 20,
+            }}
+          >
+            <Image
+              source={require("../../image/doge_logo.png")}
+              style={{ width: 30, height: 30 }}
+            />
+            <View style={{ marginLeft: 10 }}>
+              <Text style={metaStyles.defaultText}> DOGE</Text>
+              <View
+                style={{
+                  marginTop: 3,
+                  backgroundColor: "rgba(247, 147, 26, 0.2)",
+                  borderRadius: 10,
+                  width: 90,
+                  alignItems: "center",
+                  paddingVertical: 2,
+                  marginLeft: 5,
+                }}
+              >
+                <Text style={{ fontSize: 8, color: "#FF981C" }}>
+                  Bitcoin sidechain{" "}
+                </Text>
+              </View>
+            </View>
+
+            <View style={{ flex: 1 }} />
+
+            {network_mvc == netWork && (
+              <Image
+                source={require("../../image/wallets_select_icon.png")}
+                style={{ padding: 8, width: 15, height: 15 }}
+              />
+            )}
+          </View>
+        </TouchableWithoutFeedback>
+
       </View>
     </SafeAreaView>
   );

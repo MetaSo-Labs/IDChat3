@@ -1,10 +1,10 @@
-import { FEEB } from "@/lib/config";
-import { getNetwork } from "@/lib/network";
-import { getApiHost } from "@/queries/hosts";
-import { getCurrentWallet } from "@/lib/wallet";
-import { Chain } from "@metalet/utxo-wallet-service";
-import { API_NET, API_TARGET, FtManager, Wallet, mvc } from "meta-contract";
-import { getDefaultMVCTRate } from "@/queries/transaction";
+import { FEEB } from '@/lib/config';
+import { getNetwork } from '@/lib/network';
+import { getApiHost } from '@/queries/hosts';
+import { getCurrentWallet } from '@/lib/wallet';
+import { Chain } from '@metalet/utxo-wallet-service';
+import { API_NET, API_TARGET, FtManager, Wallet, mvc } from 'meta-contract';
+import { getDefaultMVCTRate } from '@/queries/transaction';
 
 export type Receiver = {
   address: string;
@@ -14,7 +14,28 @@ export type TransferTask = {
   genesis?: string;
   codehash?: string;
   receivers: Receiver[];
+  metaidData?: any;
 };
+
+function buildOpReturnV2(metaidData: any): any {
+  const res1 = ['metaid', metaidData.operation];
+  const res2 = [];
+  if (metaidData.operation !== 'init') {
+    res2.push(metaidData.path!);
+    res2.push(metaidData?.encryption ?? '0');
+    res2.push(metaidData?.version ?? '1.0.0');
+    res2.push(metaidData?.contentType ?? 'text/plain;utf-8');
+
+    const body = !metaidData.body
+      ? undefined
+      : Buffer.isBuffer(metaidData.body)
+        ? metaidData.body
+        : Buffer.from(metaidData.body, metaidData?.encoding ?? 'utf-8');
+    res2.push(body);
+  }
+  return [...res1, ...res2];
+}
+
 export async function process({
   tasks,
   broadcast = true,
@@ -30,8 +51,11 @@ export async function process({
   const address = chianWallet.getAddress();
   // const apiHost = await getApiHost();
 
-   if (!feeb) {
-    feeb = await getDefaultMVCTRate()
+  console.log("process transfer tasks进入转账", tasks, broadcast, feeb);
+  
+
+  if (!feeb) {
+    feeb = await getDefaultMVCTRate();
   }
 
   const wallet = new Wallet(purse, network, feeb, API_TARGET.APIMVC);
@@ -80,16 +104,16 @@ export async function process({
     // 如果有genesis，则说明是ft；
 
     if (task.genesis) {
-      const { txHex, routeCheckTxHex, txid, tx, routeCheckTx } =
-        await ftManager.transfer({
-          codehash: task.codehash!,
-          genesis: task.genesis,
-          receivers: task.receivers,
-          senderWif: purse,
-          noBroadcast: !broadcast,
-          // ftUtxos: foundFt ? [foundFt] : undefined,
-          utxos: theUtxo ? [theUtxo] : undefined,
-        });
+      const { txHex, routeCheckTxHex, txid, tx, routeCheckTx } = await ftManager.transfer({
+        codehash: task.codehash!,
+        genesis: task.genesis,
+        receivers: task.receivers,
+        senderWif: purse,
+        noBroadcast: !broadcast,
+        // ftUtxos: foundFt ? [foundFt] : undefined,
+        utxos: theUtxo ? [theUtxo] : undefined,
+        opreturnData: task.metaidData ? buildOpReturnV2(task.metaidData) : undefined,
+      });
       const routeCheckTxid = routeCheckTx.id;
       results.push({
         id,
@@ -124,13 +148,9 @@ export async function process({
       }));
 
       const utxos: any = theUtxo ? [theUtxo] : undefined;
-      const transferRes = await wallet.sendArray(
-        receiversWithNumericAmount,
-        utxos,
-        {
-          noBroadcast: !broadcast,
-        }
-      );
+      const transferRes = await wallet.sendArray(receiversWithNumericAmount, utxos, {
+        noBroadcast: !broadcast,
+      });
       results.push({
         id,
         txid: transferRes.txId,

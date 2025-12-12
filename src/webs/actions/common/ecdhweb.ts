@@ -17,7 +17,7 @@ export async function process(
   { password }: { password: string }
 ) {
   // const network = getNet()
-  console.log("调用ECDH：" + externalPubKey);
+  // console.log("调用ECDH：" + externalPubKey);
 
   const network = getNetwork();
   const activeWallet = await getActiveWallet();

@@ -17,7 +17,8 @@ import { createOrUpdateUserInfo, getMVCRewards } from '@/wallet/userInfo';
 import useUserStore from '@/stores/useUserStore';
 import { btcSignMessage, getBTCWalletPublicKey, getMvcAddress } from '@/wallet/walletUtils';
 import { getMetaIDUserImageUrl, getUserMetaIDInfo, isRegisterMetaID } from '../com/metaIDUtils';
-import { UerMetaIDInfo } from '@/api/type/UserMetaIDinfoBean';
+import { UserMetaIDinfoBean } from '@/api/type/UserMetaIDinfoBean';
+
 
 export default function PeoEditInfoPage() {
   const { t } = useTranslation();
@@ -33,7 +34,7 @@ export default function PeoEditInfoPage() {
 
   async function intUserMetaIDInfo() {
     if (isRegisterMetaID()) {
-      const metaIDInfo: UerMetaIDInfo = await getUserMetaIDInfo();
+      const metaIDInfo: UserMetaIDinfoBean = await getUserMetaIDInfo();
       if (isNotEmpty(metaIDInfo.name)) {
         setName(metaIDInfo.name);
       }

@@ -33,7 +33,7 @@ import {
 } from '../../utils/AsyncStorageUtil';
 import { goBack, navigate } from '../../base/NavigationService';
 import * as bip39 from '@scure/bip39';
-import { wordlist } from '@scure/bip39/wordlists/english';
+import { wordlist  } from '@scure/bip39/wordlists/english';
 import { getStorageWallets, isNoStorageWallet } from '../../utils/WalletUtils';
 import { useData } from '../../hooks/MyProvider';
 import MetaletWallet from '../../wallet/MetaletWallet';

@@ -24,13 +24,15 @@ import { PINsBean } from './type/PINsBean';
 import { Mrc721ItemBean } from './type/Mrc721ItemBean';
 import { Mrc721SerListBean } from './type/Mrc721SerListBean';
 import { DappListBean } from './type/DappListBean';
-import { UerMetaIDInfo } from './type/UserMetaIDinfoBean';
+import { UserMetaIDinfoBean } from './type/UserMetaIDinfoBean';
 
 // export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = 'https://testnet.mvcapi.com';
 export const BASE_METALET_URL = 'https://www.metalet.space';
 export const BASE_METALET_V4_URL = '/wallet-api/v4/mvc';
-export const BASE_METAID_IO_URL = 'https://man.metaid.io';
+export const BASE_METALET_V4_DOGE_URL = '/wallet-api/v4/doge';
+// export const BASE_METAID_IO_URL = 'https://man.metaid.io';
+export const BASE_METAID_IO_URL = 'https://file.metaid.io/metafile-indexer/';
 export const BASE_IDCHAT_IO_URL = 'https://api.idchat.io';
 
 //资产价格
@@ -221,6 +223,7 @@ export async function fetchSpaceBalance(address: string): Promise<SpaceBalance> 
     { net: network, address: address },
   );
 
+  console.log('fetchSpaceBalance', data);
   const dataMvcBalance: SpaceBalance = data.data as SpaceBalance;
 
   return dataMvcBalance;
@@ -497,14 +500,19 @@ export async function fetchDappList(): Promise<DappListBean> {
 }
 
 //29.metaID  info
-export async function fetchUserMetaIDInfo(address: string): Promise<UerMetaIDInfo> {
+export async function fetchUserMetaIDInfo(address: string): Promise<UserMetaIDinfoBean> {
   const network = await getWalletNetwork();
-
-  const data: RootDataObject = await get(BASE_METAID_IO_URL + '/api/info/address/'+address, true, {
-    net: network,
-    address: address,
-  });
-  const dataUserInfo: UerMetaIDInfo = data.data as UerMetaIDInfo;
+  // https://man.metaid.io/api/info/address/1C2XjqoXHRegJNnmJqGDMt3rbAcrYLX4L9
+  const data: RootDataObject = await get(
+    BASE_METAID_IO_URL + '/api/info/address/' + address,
+    true,
+    {
+      net: network,
+      address: address,
+    },
+  );
+  console.log('fetchUserMetaIDInfo: ', data);  //1C2XjqoXHRegJNnmJqGDMt3rbAcrYLX4L9
+  const dataUserInfo: UserMetaIDinfoBean = data.data as UserMetaIDinfoBean;
 
   return dataUserInfo;
 }
@@ -518,3 +526,44 @@ export async function fetchCheckIDChatUpgrade(platform: string): Promise<UpdateD
   });
   return data;
 }
+
+
+// balance
+//12.doge balance
+export async function fetchDogeBalance(address: string): Promise<SpaceBalance> {
+  const network = await getWalletNetwork();
+
+  const data: RootDataObject = await get(
+    BASE_METALET_URL + BASE_METALET_V4_DOGE_URL + '/address/balance-info',
+    false,
+    { net: network, address: address },
+  );
+
+  const dataMvcBalance: SpaceBalance = data.data as SpaceBalance;
+
+  return dataMvcBalance;
+}
+
+
+
+export async function fetchDogeActivity(address: string, isConfirm: boolean) {
+  // const data = await get(
+  //   BASE_MVC_API_URL + "/address/" + address + "/tx",
+  //   false,
+  //   { confirm: isConfirm }
+  // );
+  // return data;
+  const network = await getWalletNetwork(Chain.BTC);
+  const result: RootDataObject2 = await get(
+    BASE_METALET_URL + BASE_METALET_V4_DOGE_URL + '/address/tx-list',
+    false,
+    { net: network, address: address },
+  );
+  console.log('fetchMvcActivityComfird', result);
+
+  const data = result.data.list as MvcActivityRecord[];
+  return data;
+}
+
+
+

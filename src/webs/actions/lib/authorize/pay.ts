@@ -6,12 +6,14 @@ import { clearChunkData, getChunkData } from "../query/storage-chunk";
 
 
 export async function process(params: any) {
+  console.log("调用pay方法 params:", params);
   const toPayTransactions = params.transactions;
   const payedTransactions = await payTransactions(
     toPayTransactions,
     params.hasMetaid,
     params.feeb
   );
+    console.log("调用Pay 返回:", payedTransactions);
   return { payedTransactions };
 }
 

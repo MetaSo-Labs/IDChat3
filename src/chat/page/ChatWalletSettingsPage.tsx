@@ -350,6 +350,35 @@ export default function ChatWalletSettingsPage(props: any) {
               </View>
             </TouchableWithoutFeedback>
 
+               <TouchableWithoutFeedback
+              onPress={() => {
+                navigate('ToolkitPage');
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginTop: 20,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Image
+                  source={require('@image/chat_settings_toolkit.png')}
+                  style={{ width: 45, height: 45 }}
+                />
+                <Text style={{ marginLeft: 10, color: '#303133', fontSize: 16 }}>
+                 Toolkit
+                </Text>
+                <View style={{ flex: 1 }} />
+                <Image
+                  source={require('@image/list_icon_ins.png')}
+                  style={{ width: 20, height: 20 }}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+
+
             <TouchableWithoutFeedback
               onPress={() => {
                 setIsDisclaimer(true);

@@ -3,14 +3,17 @@ import * as GetUtxos from './lib/query/get-utxos';
 import * as GetBalance from './lib/query/get-balance';
 import * as GetNetwork from './lib/query/get-network';
 import * as GetAddress from './lib/query/get-address';
+import * as GetAppVersionCode from './lib/query/get-app-version-code';
 import * as SetAppBadge from './lib/query/set_badge';
 import * as NeedWebRefresh from './lib/query/set_upload_status';
+import * as OpenAppBrowser from './lib/query/open_webview';
 import * as IsConnected from './lib/query/is-connected';
 import * as GetPublicKey from './lib/query/get-public-key';
 import * as VerifySignature from './lib/query/verify-signature';
 import * as GetTokenBalance from './lib/query/get-token-balance';
 import * as GetXPublicKey from './lib/query/get-extended-public-key';
 import * as PreviewTransaction from './lib/query/preview-transaction';
+import * as GetPKHByPath from './lib/query/get-pkh-by-path';
 // import * as Listen from '../lib/actions/listen'
 
 // // BTC
@@ -61,6 +64,9 @@ export default {
   ECDH,
   SmallPay: SmallPay,
   SetAppBadge,
-  NeedWebRefresh
+  NeedWebRefresh,
+  OpenAppBrowser,
+  GetAppVersionCode,
+  GetPKHByPath
   // StorageChunk
 } as { [key: string]: QueryAction };

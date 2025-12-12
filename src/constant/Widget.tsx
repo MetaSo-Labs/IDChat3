@@ -32,16 +32,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 import { Camera, CameraView } from 'expo-camera';
+import RNModal from 'react-native-modal';
 
 const storage = createStorage();
 
 export const styles = StyleSheet.create({
   centeredView: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     // backgroundColor: 'rgba(0, 0, 0, 0.1)',
@@ -90,6 +87,7 @@ export const RoundSimButton = ({
   title,
   event,
   color = themeColor,
+  // textColor = normalColor,
   textColor = normalColor,
   roundStytle = {},
 }) => {
@@ -107,8 +105,8 @@ export const RoundSimButton = ({
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: 20,
-            borderColor: normalColor,
-            borderWidth: 1,
+            // borderColor: normalColor,
+            // borderWidth: 1,
           },
         ]}
       >
@@ -221,9 +219,11 @@ export const RoundSimButtonFlee = ({
 //2.title bar
 export const TitleBar = ({
   title = '',
+  left = '',
   event = (props) => {
     goBack();
   },
+  leftEvent = () => {},
 }) => {
   return (
     <TouchableWithoutFeedback onPress={event}>
@@ -245,8 +245,11 @@ export const TitleBar = ({
         >
           {title}
         </Text>
+        <View style={{ flex: 1 }} />
 
-        <Text style={{ marginRight: 20, color: '#333', fontSize: 16 }}> </Text>
+        <TouchableWithoutFeedback onPress={leftEvent}>
+          <Text style={{ marginRight: 20, color: '#333', fontSize: 16 }}>{left} </Text>
+        </TouchableWithoutFeedback>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -313,41 +316,68 @@ export const useEasyToast = (position: 'top' | 'bottom' | 'center') => {
 
 //4.loading Modal 弹框来着
 export const LoadingModal = ({ isShow = true, title = '', isCancel = true, event = () => {} }) => {
-  // const [obj, setObj] = useState({ title: title, isShow: isShow ,isCancel:isCancel});
-
-  // animationType="slide"
-  // transparent={true}
-  // visible={obj.isShow}
-  // onRequestClose={() => {
-  // setModalVisible(false);
-  // }}
-
-  // const closeModal=()=>{
-  //   setObj({...obj,isShow:false})
-  // }
 
   return (
-    <Modal animationType="fade" transparent={true} visible={isShow}>
-      <TouchableWithoutFeedback
-        onPress={() => {
-          if (isCancel) {
-            event();
-          }
-          // if(isCancel)
-          // setObj({...obj,isShow:false})
-        }}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <ActivityIndicator size={'large'} color={'#fff'} />
+    <Modal animationType="fade" transparent={true} visible={isShow} statusBarTranslucent={true}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            if (isCancel) {
+              event();
+            }
+            // if(isCancel)
+            // setObj({...obj,isShow:false})
+          }}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <ActivityIndicator size={'large'} color={'#fff'} />
+            </View>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </View>
     </Modal>
   );
 };
 
+// export const LoadingModal = ({ isShow = true, title = '', isCancel = true, event = () => {} }) => {
+//   return (
+//     <RNModal
+//       isVisible={isShow}
+//       animationIn="fadeIn"
+//       animationOut="fadeOut"
+//       backdropOpacity={0.3}
+//       onBackdropPress={isCancel ? event : undefined}
+//       useNativeDriver
+//       hideModalContentWhileAnimating
+//       style={{ justifyContent: 'center', alignItems: 'center', margin: 0 }}
+//     >
+//       <View
+//         style={{
+//           width: 120,
+//           height: 120,
+//           borderRadius: 10,
+//           backgroundColor: 'rgba(0,0,0,0.7)',
+//           justifyContent: 'center',
+//           alignItems: 'center',
+//           padding: 10,
+//         }}
+//       >
+//         <ActivityIndicator size="large" color="#fff" />
+//         {title ? (
+//           <Text style={{ color: '#fff', fontSize: 14, marginTop: 10, textAlign: 'center' }}>
+//             {title}
+//           </Text>
+//         ) : null}
+//       </View>
+//     </RNModal>
+//   );
+// };
+
 //5.loading Modal 弹框来着
+
+
+
 export const LoadingNoticeModal = ({
   isShow = true,
   title = '',

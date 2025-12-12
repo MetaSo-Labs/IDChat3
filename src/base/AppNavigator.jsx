@@ -105,6 +105,17 @@ import WebViewPage from '@/chat/page/WebViewPage';
 import PushPage from '@/chat/page/PushPage';
 import SwitchAccountPage from '@/chat/page/SwitchAccountPage';
 import DappWebsPage from '@/chat/page/DappWebsPage';
+import MnemonicImportPage from '@/chat/page/MnemonicImportPage';
+import ImportWalletNetNewPage from '@/page/ImportWalletNetNewPage';
+import OpenWebsPage from '@/chat/page/OpenWebsPage';
+import FeedBackPage from '@/chat/page/FeedBackPage';
+import DeleteIDChatPage from '@/page/wallet/DeleteIDChatPage';
+import ToolkitPage from '@/chat/page/ToolkitPage';
+import MergeSpacePage from '@/chat/page/MergeSpacePage';
+import MergeFtPage from '@/chat/page/MergeFtPage';
+import AssetsDogeDetailPage from '@/page/home/AssetsDogeDetailPage';
+import SendDogePage from '@/page/home/SendDogePage';
+import SendDogeSuccessPage from '@/page/home/SendDogeSuccessPage';
 
 ////////
 
@@ -227,6 +238,18 @@ const StackNavigator = () => (
     <Stack.Screen name="PushPage" component={PushPage} />
     <Stack.Screen name="SwitchAccountPage" component={SwitchAccountPage} />
     <Stack.Screen name="DappWebsPage" component={DappWebsPage} />
+    <Stack.Screen name="MnemonicImportPage" component={MnemonicImportPage} />
+    <Stack.Screen name="ImportWalletNetNewPage" component={ImportWalletNetNewPage} />
+    <Stack.Screen name="OpenWebsPage" component={OpenWebsPage} />
+    <Stack.Screen name="FeedBackPage" component={FeedBackPage} />
+    <Stack.Screen name="DeleteIDChatPage" component={DeleteIDChatPage} />
+    <Stack.Screen name="ToolkitPage" component={ToolkitPage} />
+    <Stack.Screen name="MergeSpacePage" component={MergeSpacePage} />
+    <Stack.Screen name="MergeFtPage" component={MergeFtPage} />
+    <Stack.Screen name="AssetsDogeDetailPage" component={AssetsDogeDetailPage} />
+    <Stack.Screen name="SendDogePage" component={SendDogePage} />
+    <Stack.Screen name="SendDogeSuccessPage" component={SendDogeSuccessPage} />
+
     {/* <Stack.Screen name="PushPage " component={PushPage} /> */}
   </Stack.Navigator>
 );

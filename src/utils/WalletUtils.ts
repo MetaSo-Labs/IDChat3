@@ -80,6 +80,8 @@ export async function getStorageCurrentWallet(): Promise<WalletBean> {
   }
 }
 
+
+
 export async function setCurrentStorageWallet(walletBean: WalletBean, mvcPath: number) {
   const wallets = await getWalletBeans();
   const wallet = wallets.find((itemWallet) => {
@@ -270,6 +272,8 @@ export async function goToWebScan(chain: string, linkTx: string) {
     } else {
       url = 'https://mempool.space/tx/' + linkTx;
     }
+  }else if (chain == 'doge') {
+      url = 'https://dogechain.info/tx/' + linkTx;
   }
 
   console.log('url', url);

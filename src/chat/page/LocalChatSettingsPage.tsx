@@ -348,7 +348,7 @@ export default function LocalChatSettingsPage(props: any) {
             <TitleBar title={t('s_settings')} />
           </View>
 
-          <View style={{ marginHorizontal:20, flex: 1 }}>
+          <View style={{ marginHorizontal: 20, flex: 1 }}>
             <TouchableWithoutFeedback
               onPress={() => {
                 setIsLanguage(true);
@@ -362,7 +362,6 @@ export default function LocalChatSettingsPage(props: any) {
                   justifyContent: 'center',
                 }}
               >
-             
                 <Text style={{ marginLeft: 10, color: '#303133', fontSize: 16 }}>
                   {t('s_language')}
                 </Text>
@@ -376,11 +375,10 @@ export default function LocalChatSettingsPage(props: any) {
                 />
               </View>
             </TouchableWithoutFeedback>
-          
 
-            {/* <TouchableWithoutFeedback
+            <TouchableWithoutFeedback
               onPress={() => {
-                 navigate('PushPage');
+                navigate('FeedBackPage');
               }}
             >
               <View
@@ -391,14 +389,16 @@ export default function LocalChatSettingsPage(props: any) {
                   justifyContent: 'center',
                 }}
               >
-             
                 <Text style={{ marginLeft: 10, color: '#303133', fontSize: 16 }}>
-                  Push Notifications
+                { t('pro_feed_back') }
                 </Text>
                 <View style={{ flex: 1 }} />
-                
+                <Image
+                  source={require('@image/list_icon_ins.png')}
+                  style={{ width: 20, height: 20 }}
+                />
               </View>
-            </TouchableWithoutFeedback> */}
+            </TouchableWithoutFeedback>
 
             <TouchableWithoutFeedback
               onPress={() => {
@@ -414,7 +414,6 @@ export default function LocalChatSettingsPage(props: any) {
                   justifyContent: 'center',
                 }}
               >
-               
                 <Text style={{ marginLeft: 10, color: '#303133', fontSize: 16 }}>
                   {/* {t('s_backup_wallet')} */}
                   About the APP

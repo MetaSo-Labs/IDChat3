@@ -106,6 +106,57 @@ export default function SendSelectAssertPage() {
 
 
 
+        <TouchableWithoutFeedback
+          onPress={() => {
+            navigate("SendDogePage");
+          }}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              marginTop: 30,
+              marginHorizontal: 20,
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={require("../../../image/doge_logo.png")}
+              style={{ width: 45, height: 45,  }}
+            />
+            <View style={{ marginLeft: 12 }}>
+              <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                SPACE
+              </Text>
+
+              <View
+                style={{
+                  marginTop: 3,
+                  backgroundColor: "rgba(247, 147, 26, 0.2)",
+                  borderRadius: 10,
+                  alignItems: "center",
+                  paddingVertical: 2,
+                  paddingHorizontal:5
+                }}
+              >
+                <Text style={{ fontSize: 8, color: "#FF981C" }}>
+                  Bitcoin sidechain{" "}
+                </Text>
+              </View>
+              {/* <Text style={{ marginTop: 10, fontSize: 14, color: "#666" }}>
+                sdfewfwsf
+              </Text> */}
+            </View>
+
+            <View style={{ flex: 1 }} />
+
+            <View>
+              <Text style={{ color: "#333", fontSize: 16,textAlign:'right' }}>{metaletWallet.currentDogeBalance} DOGE </Text>
+              <Text style={{ color: "#666", fontSize: 14 ,marginTop:10,textAlign:'right'}}>${(metaletWallet.currentDogeAssert)}</Text>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+
+
       </View>
     </SafeAreaView>
   );
