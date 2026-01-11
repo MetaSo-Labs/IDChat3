@@ -1,3 +1,4 @@
+import { AddressType } from "@metalet/utxo-wallet-sdk";
 import { BtcWallet, Chain, MvcWallet } from "@metalet/utxo-wallet-service";
 
 interface Account {
@@ -15,6 +16,7 @@ export interface Wallet {
   isBackUp: boolean;
   seed: string;
   accountsOptions: Account[];
+  addressDogeType:AddressType;
 }
 
 export interface WalletMap {

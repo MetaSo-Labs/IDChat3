@@ -87,8 +87,8 @@ export async function caculateMvcAndBtcAssert(mvcAddrss, btcAddress): Promise<Sh
   let isMain = network === 'mainnet' ? true : false;
   const btcPrice = assertPrice.data.priceInfo.btc;
   const spacePrice = assertPrice.data.priceInfo.space;
-  // const dogePrice = assertPrice.data.priceInfo.doge;
-  const dogePrice = 0;
+  const dogePrice = assertPrice.data.priceInfo.doge;
+  // const dogePrice = 0;
   const time1 = new Date().getTime();
   //当前时间毫秒数
   // console.log("开始计算：",time1);

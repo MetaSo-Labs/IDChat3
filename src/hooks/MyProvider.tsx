@@ -40,6 +40,8 @@ type GlobalContext = {
   updateSpaceBalance;
   btcBalance;
   updateSetBtcBalance;
+  dogeBalance;
+  updateDogeBalance;
   isShowPay;
   updateIsShowPay;
   mvcPath;
@@ -60,6 +62,8 @@ type GlobalContext = {
   updateWebLogout;
   needWebRefresh;
   updateNeedWebRefresh;
+  chatNodeNow:string;
+  updateChatNodeNow;
 };
 
 const UserContext = createContext<GlobalContext>(undefined);
@@ -163,6 +167,11 @@ export const UserProvider = ({ children }) => {
     setBtcBalance(newData);
   };
 
+  const [dogeBalance, setDogeBalance] = useState('');
+  const updateDogeBalance = (newData) => {
+    setDogeBalance(newData);
+  };
+
   const [isShowPay, setIsShowPay] = useState(0);
   const updateIsShowPay = (newData) => {
     setIsShowPay(newData);
@@ -192,6 +201,11 @@ export const UserProvider = ({ children }) => {
   const [switchAccount, setSwitchAccount] = useState('');
   const updateSwitchAccount = (newData) => {
     setSwitchAccount(newData);
+  };
+
+  const [chatNodeNow, setChatNodeNow] = useState('https://www.idchat.io/chat');
+  const updateChatNodeNow = (newData) => {
+    setChatNodeNow(newData);
   };
 
   const [isBackUp, setIsBackUp] = useState(true);
@@ -248,6 +262,8 @@ export const UserProvider = ({ children }) => {
     updateSpaceBalance,
     btcBalance,
     updateSetBtcBalance,
+    dogeBalance,
+    updateDogeBalance,
     isShowPay,
     updateIsShowPay,
     mvcPath,
@@ -268,6 +284,8 @@ export const UserProvider = ({ children }) => {
     updateWebLogout,
     needWebRefresh,
     updateNeedWebRefresh,
+    chatNodeNow,
+    updateChatNodeNow,
   };
 
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;

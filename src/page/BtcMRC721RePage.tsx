@@ -80,7 +80,6 @@ export default function BtcMRC721RePage() {
     // console.log("address", address);
     // console.log("getBtcNftData", btcAddress);
     const mrc721SerList: Mrc721SerListBean[] = await fetchMRC721sList(address);
-    console.log("查询结果地址是：",address);
     
     if (mrc721SerList.length > 0) {
       for (let i = 0; i < mrc721SerList.length; i++) {

@@ -1,5 +1,33 @@
 import * as btcjs from "bitcoinjs-lib";
-import * as ecc from "@bitcoinerlab/secp256k1";
+import { Platform } from 'react-native';
+let _ecc: any = null;
+async function ensureEcc() {
+  if (_ecc) return _ecc;
+  if (Platform.OS === 'ios') {
+    const noble = await import('@noble/secp256k1');
+    _ecc = noble as any;
+    console.log('[sign-psbt] forced @noble/secp256k1 on iOS');
+    return _ecc;
+  }
+  try {
+    const candidate = await import('@bitcoinerlab/secp256k1');
+    try {
+      const sample = Buffer.alloc(32);
+      if (typeof candidate.pointFromScalar === 'function') candidate.pointFromScalar(new Uint8Array(sample), true);
+      _ecc = candidate;
+      console.log('[sign-psbt] using @bitcoinerlab/secp256k1');
+      return _ecc;
+    } catch (e) {
+      // probe failed
+    }
+  } catch (e) {
+    // import failed
+  }
+  const noble = await import('@noble/secp256k1');
+  _ecc = noble as any;
+  console.log('[sign-psbt] fallback to @noble/secp256k1');
+  return _ecc;
+}
 import { getCurrentWallet } from "@/lib/wallet";
 import { getBtcNetwork, getNetwork } from "@/lib/network";
 import { Chain, ScriptType } from "@metalet/utxo-wallet-service";
@@ -165,7 +193,8 @@ const formatOptionsToSignInputs = async (
       typeof _psbt === "string"
         ? Psbt.fromHex(_psbt as string, { network: psbtNetwork })
         : (_psbt as Psbt);
-    psbt.data.inputs.forEach((v, index) => {
+    for (let index = 0; index < psbt.data.inputs.length; index++) {
+      const v = psbt.data.inputs[index];
       let script: any = null;
       let value = 0;
       if (v.witnessUtxo) {
@@ -179,7 +208,12 @@ const formatOptionsToSignInputs = async (
       }
       const isSigned = v.finalScriptSig || v.finalScriptWitness;
       if (script && !isSigned) {
-        btcjs.initEccLib(ecc);
+        const ecc = await ensureEcc();
+        try {
+          btcjs.initEccLib(ecc);
+        } catch (e) {
+          // ignore if init fails for noble
+        }
         const address = btcjs.address.fromOutputScript(script, psbtNetwork);
         if (account.address === address) {
           toSignInputs.push({
@@ -189,7 +223,7 @@ const formatOptionsToSignInputs = async (
           });
         }
       }
-    });
+    }
   }
   return toSignInputs;
 };

@@ -466,12 +466,13 @@ const actions = {
   openAppBrowser:{ action: "OpenAppBrowser", type: "query" },
   getAppVersionCode:{ action: "GetAppVersionCode", type: "query" },
   getPKHByPath:{ action: "GetPKHByPath", type: "query" },
+  getGlobalMetaid:{ action: "GetGlobalMetaid", type: "query" },
   signTransaction:{ action: "SignTransaction", type: "authorize" },
   eciesDecrypt:{ action: "EciesDecrypt", type: "authorize" },
   eciesEncrypt:{ action: "EciesEncrypt", type: "authorize" },
 };
 
-const metalet = { btc: {}, token: {} ,common: {} };
+const metalet = { btc: {}, token: {} ,common: {} , doge: {}, };
 
 Object.keys(actions).forEach((key) => {
   metalet[key] = async function (params) {
@@ -505,9 +506,31 @@ const btcKeys = {
   inscribe: [{ name: "inscribeTransfer", action: "InscribeTransfer" }],
 };
 
+const dogeKeys = {
+  query: [
+    { name: 'getBalance', action: 'GetDOGEBalance' },
+    { name: 'getAddress', action: 'GetDOGEAddress' },
+    { name: 'getPublicKey', action: 'GetDOGEPublicKey' },
+    { name: 'getUtxos', action: 'GetDOGEUtxos' },
+  ],
+  authorize: [
+    { name: 'inscribe', action: 'DogeInscribe' },
+  ],
+  inscribe: [],
+};
+
 Object.keys(btcKeys).forEach((type) => {
   btcKeys[type].forEach((item) => {
     metalet.btc[item.name] = async function (params) {
+      return await postMessage(item.action, type, params);
+    };
+  });
+});
+
+
+Object.keys(dogeKeys).forEach((type) => {
+  dogeKeys[type].forEach((item) => {
+    metalet.doge[item.name] = async function (params) {
       return await postMessage(item.action, type, params);
     };
   });

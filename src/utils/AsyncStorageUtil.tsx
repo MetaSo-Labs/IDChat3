@@ -92,6 +92,10 @@ export const wallet_language_en = 'en';
 export const wallet_language_zh = 'zh';
 export const USER_NOTICE_KEY = 'user_behavior_notice_shown';
 
+
+//chat
+export const CHAT_NODE_KEY = 'chat_node_key';
+
 //创建数据
 export const AsyncStorageUtil = {
   //set

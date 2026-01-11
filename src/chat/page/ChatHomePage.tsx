@@ -6,7 +6,7 @@ import { useData } from '@/hooks/MyProvider';
 import WebView from 'react-native-webview';
 // import { injectedJavaScript } from "./inject";
 import CloseIcon from '@/components/icons/CloseIcon';
-import { createElement, ComponentType, useCallback } from 'react';
+import { createElement, ComponentType, useCallback, act } from 'react';
 // import actionDispatcher from "./actions/action-dispatcher";
 import React, { useEffect, useRef, useState } from 'react';
 import { navigate, goBack } from '@/base/NavigationService';
@@ -44,6 +44,7 @@ import { Line } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   AsyncStorageUtil,
+  CHAT_NODE_KEY,
   createStorage,
   no_notice_key,
   wallet_language_key,
@@ -79,6 +80,7 @@ import { Portal } from 'react-native-paper';
 import { sleep } from '@/lib/helpers';
 import { DogeCoinWallet, getDogeCoinWallet } from '../wallet/doge/DogeCoinWallet';
 import * as getPKHByPath from '@/webs/actions/lib/query/get-pkh-by-path';
+import { getDogeWallet } from '../wallet/doge/wallet';
 
 interface Message {
   host: string;
@@ -88,19 +90,26 @@ interface Message {
   params: Record<string, unknown>;
   action: `${string}-${ActionType}`;
 }
+
+// export let webChatNode = 'https://www.idchat.io/chat';
 export default function ChatHomePage() {
   const { setCurrentWallet } = useWalletStore();
   const { metaletWallet, updateMetaletWallet } = useData();
   const { needInitWallet, updateNeedInitWallet } = useData();
   const { switchAccount, updateSwitchAccount } = useData();
   const { needWebRefresh, updateNeedWebRefresh } = useData();
+  const { chatNodeNow, updateChatNodeNow } = useData();
+  const [chatNodeUri, setChatNodeUri] = useState<string>('https://www.idchat.io/chat');
+  // const [chatNodeUri, setChatNodeUri] = useState<string>('https://chat-eta-swart-50.vercel.app/talk/@me/b561918bc281f5ff2e0512b571c28c2853fc07e1d20bab73537445ac4867813b');
+  const [isUriReady, setIsUriReady] = useState(false);
 
   const [canGoBack, setCanGoBack] = useState(false);
   const webViewRef = useRef(null);
-  const url = 'https://www.idchat.io/chat';
+  // const url = 'https://www.idchat.io/chat';
   // const url = 'https://testchat.show.now/';
-  const currentUrl = useRef(url);
-  const [uri, setURI] = useState(url);
+
+  const currentUrl = useRef(chatNodeUri);
+  // const [uri, setURI] = useState(chatNodeNow);
   const [uriReady, setReadyURI] = useState('');
   const { walletLanguage, updateWalletLanguage } = useData();
 
@@ -148,6 +157,12 @@ export default function ChatHomePage() {
     requestBadgePermission();
     changeLanguage();
 
+    getChatNode();
+    // setTimeout(() => {
+    //   getChatNode();
+    //   setIsShowLoading(false);
+    // }, 3000);
+
     const sub = Notifications.addNotificationReceivedListener(async () => {
       const count = await Notifications.getBadgeCountAsync();
       await Notifications.setBadgeCountAsync(count + 1);
@@ -171,7 +186,6 @@ export default function ChatHomePage() {
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log('in useFocusEffect ChatHomePage');
       byLogin();
       if (isNeedRefreshWebRef.current) byRefresh();
       onTabChange();
@@ -206,12 +220,12 @@ export default function ChatHomePage() {
         await sleep(3000);
 
         if (isNeedRefreshWebRef.current) {
-          updateReloadKey((k) => {
-            const next = getRandomNum();
-            reloadKeyRef.current = next; // 更新 ref
-            console.log('old key:', k, 'new key:', next);
-            return next;
-          });
+          // updateReloadKey((k) => {
+          //   const next = getRandomNum();
+          //   reloadKeyRef.current = next; // 更新 ref
+          //   console.log('old key:', k, 'new key:', next);
+          //   return next;
+          // });
         }
       }
       appStateRef.current = nextState;
@@ -224,6 +238,7 @@ export default function ChatHomePage() {
   useEffect(() => {
     console.log('✅ 最新 reloadKey:', reloadWebKey);
     if (isNeedRefreshWebRef.current) byRefresh();
+    getChatNode();
   }, [reloadWebKey]);
 
   // 监听 reloadKey 变化，始终能拿到最新值
@@ -242,14 +257,11 @@ export default function ChatHomePage() {
   /////////////////////////////////init/////////////////////////////
   async function initChatWallet() {
     const pubk = await getPKHByPath.process({ path: 'm/100/0' }, { password: '' });
-    console.log('通过路径获取的PKH：' + pubk);
     const baseWallet: BaseWalletTools = await initBaseChatWallet();
-    console.log('baseWallet', baseWallet.currentBtcWallet.getAddress());
-    console.log('baseWallet', baseWallet.currentMvcWallet.getAddress());
+    // console.log('baseWallet', baseWallet.currentBtcWallet.getAddress());
+    // console.log('baseWallet', baseWallet.currentMvcWallet.getAddress());
     const privateKey = baseWallet.currentMvcWallet.getPrivateKey();
-    console.log('baseWallet privateKey：', privateKey);
     const publicKey = baseWallet.currentMvcWallet.getPublicKey().toString('hex');
-    console.log('baseWallet publicKey:', publicKey);
     baseWallet.currentMvcWallet.getPublicKey;
 
     const mvcWallet = baseWallet.currentBtcWallet;
@@ -258,6 +270,10 @@ export default function ChatHomePage() {
     metaletWallet.currentMvcWallet = mvcWallet;
     updateMetaletWallet(metaletWallet);
     setCurrentWallet({ btcWallet: currentBtcWallet, mvcWallet: mvcWallet });
+
+    const wallet = await getDogeWallet();
+    const address = wallet.getAddress();
+    console.log('addressDoge: ', address);
     //  sendWebMessage('isLogin', { isLogin: true, address: "address"});
   }
 
@@ -293,6 +309,22 @@ export default function ChatHomePage() {
     i18n.changeLanguage(newLanguage); // 切换语言
     updateWalletLanguage(newLanguage);
   };
+
+  async function getChatNode() {
+    const nodeChat = await AsyncStorageUtil.getItemDefault(
+      CHAT_NODE_KEY,
+      'https://www.idchat.io/chat',
+    ).then((value) => {
+      updateChatNodeNow(value);
+      // webChatNode = nodeChat;
+      setChatNodeUri(value);
+      // updateReloadKey(getRandomNum());
+      setIsShowLoading(false);
+      setIsUriReady(true);
+
+      console.log('nodeChat', value);
+    });
+  }
 
   //////////////////////////web function////////////////////////////////////////////////
   async function byLogin() {
@@ -358,7 +390,6 @@ export default function ChatHomePage() {
     // const hexTx = await dogeWallet.buildAndSignTx('DAk4Uq7pKhvcg4J3vwRYSkUc9FJeFxpNsn', 0.3);
     // const result = dogeWallet.broadcastTx(hexTx);
     // console.log('TxID : ' + JSON.stringify(result));
-
   }
 
   //webs
@@ -378,7 +409,10 @@ export default function ChatHomePage() {
     console.log('handleNavigationStateChange', navState.canGoBack);
     setCanGoBack(navState.canGoBack);
     setReadyURI(navState.url);
-    setURI(navState.url);
+    // setURI(navState.url);
+    updateChatNodeNow(navState.url);
+    // webChatNode = navState.url;
+    setChatNodeUri(navState.url);
     currentUrl.current = navState.url;
   };
 
@@ -434,6 +468,7 @@ export default function ChatHomePage() {
           // console.log("confirmAction params", componentInfo.params);
           console.log('actionName 执行4444 ', componentInfo.params);
           const data = await process(componentInfo.params, actionMsg.host);
+          console.log('actionName 执行5555inscribe 结果： ', data);
           setIsShowLoading(false);
 
           postMessage(
@@ -496,7 +531,7 @@ export default function ChatHomePage() {
   };
 
   const handlerMessage = async (message: Message & { type: string; data: unknown }) => {
-    // console.log('handlerMessage', JSON.stringify(message));
+    console.log('handlerMessage', JSON.stringify(message));
 
     // if (message.type === 'Console') {
     //   console.info(`[Console] ${JSON.stringify(message.data)}`);
@@ -549,6 +584,14 @@ export default function ChatHomePage() {
     if (actionName === 'Connect') {
       message.params.icon = message.icon;
     }
+
+    // let metaID = true;
+    // if (metaID) {
+    //   metaID = false;
+    //   const { process } = actionDispatcher('GetGlobalMetaid', ActionType.Query);
+    //   const data = await process(message.params, message.host);
+    //   console.log('GetGlobalMetaid data : ' + JSON.stringify(data));
+    // }
 
     actionMsg2 = message;
     // console.log("actionMsg2 执行111 ", JSON.stringify(actionMsg2));
@@ -880,9 +923,10 @@ export default function ChatHomePage() {
                 <TouchableWithoutFeedback
                   onPress={async () => {
                     setIsShowWebNotice(false);
-                    setURI(uriReady);
+                    // setURI(uriReady);
+                    // updateChatNodeNow(uriReady);
+                    // webChatNode = uriReady;
                     console.log('uriReady', uriReady);
-                    console.log('uri', uri);
                     setIsFocusEdit(false);
                     Keyboard.dismiss();
                     if (webViewRef.current) webViewRef.current.reload();
@@ -924,74 +968,49 @@ export default function ChatHomePage() {
             >
               <Text style={{ marginBottom: 16, fontSize: 30 }}>发送事件</Text>
             </TouchableWithoutFeedback> */}
-            <WebView
-              key={reloadWebKey}
-              style={{ flex: 1 }}
-              ref={webViewRef}
-              source={{ uri }}
-              useWebKit={true}
-              onError={onError}
-              allowFileAccess={true}
-              javaScriptEnabled={true}
-              injectedJavaScript={injectedJavaScript}
-              domStorageEnabled={true}
-              scrollEnabled={true}
-              nestedScrollEnabled={true}
-              cacheEnabled={true}
-              onLoadStart={() => console.log('WebView start')}
-              onLoadEnd={() => {
-                console.log('WebView end');
-                setTimeout(() => {
-                  byLogin();
-                }, 2000);
-                setTimeout(() => {
-                  byLogin();
-                }, 4000);
-                setTimeout(() => {
-                  byLogin();
-                }, 6000);
-                // sendWebMessage({ isLogin: true });
-                // const address = await getMvcAddress();
-                // console.log('address', address);
-              }}
-              // cacheMode="LOAD_CACHE_ELSE_NETWORK"
-              javaScriptCanOpenWindowsAutomatically={true}
-              onMessage={(e) => {
-                handlerMessage(JSON.parse(e.nativeEvent.data));
-              }}
-              userAgent={Platform.OS === 'ios' ? 'IDChat-iOS' : 'IDChat-Android'}
-              androidHardwareAccelerationDisabled={false}
-              onNavigationStateChange={handleNavigationStateChange}
-              originWhitelist={['*']}
-              // onShouldStartLoadWithRequest={(request) => {
-              //   console.log('即将加载的链接:', request.url);
-              //   console.log('当前链接是：', currentUrl.current);
 
-              //   if (currentUrl.current.includes('idchat.io')) return true;
-
-              //   if (!isNavigating.current) {
-              //     isNavigating.current = true;
-              //     navigate('DappWebsPage', { url: request.url });
-              //     setTimeout(() => (isNavigating.current = false), 1000);
-              //   }
-              //   return false;
-              //             if (currentUrl.current.includes('idchat.io')) {
-              //               return true;
-              //             } else {
-              //               if (!isNavigating.current) {
-              //   isNavigating.current = true;
-              //   setTimeout(() => (isNavigating.current = false), 1000);
-              //   navigate('DappWebsPage', { url: request.url });
-              // }
-              //               console.log('in handleNavigationStateChange', request.url);
-              //               navigate('DappWebsPage', { url: request.url });
-              //               // navigate('WebViewPage', {
-              //               //   url: request.url,
-              //               // });
-              //               return false; // 阻止加载
-              //             }
-              // }}
-            />
+            {isUriReady && (
+              <WebView
+                key={reloadWebKey}
+                style={{ flex: 1 }}
+                ref={webViewRef}
+                source={{ uri: chatNodeUri }}
+                useWebKit={true}
+                onError={onError}
+                allowFileAccess={true}
+                javaScriptEnabled={true}
+                injectedJavaScript={injectedJavaScript}
+                domStorageEnabled={true}
+                scrollEnabled={true}
+                nestedScrollEnabled={true}
+                cacheEnabled={true}
+                onLoadStart={() => console.log('WebView start')}
+                onLoadEnd={async () => {
+                  console.log('WebView end');
+                  setTimeout(() => {
+                    byLogin();
+                  }, 2000);
+                  setTimeout(() => {
+                    byLogin();
+                  }, 4000);
+                  setTimeout(() => {
+                    byLogin();
+                  }, 6000);
+                  // sendWebMessage({ isLogin: true });
+                  // const address = await getMvcAddress();
+                  // console.log('address', address);
+                }}
+                // cacheMode="LOAD_CACHE_ELSE_NETWORK"
+                javaScriptCanOpenWindowsAutomatically={true}
+                onMessage={(e) => {
+                  handlerMessage(JSON.parse(e.nativeEvent.data));
+                }}
+                userAgent={Platform.OS === 'ios' ? 'IDChat-iOS' : 'IDChat-Android'}
+                androidHardwareAccelerationDisabled={false}
+                onNavigationStateChange={handleNavigationStateChange}
+                originWhitelist={['*']}
+              />
+            )}
           </View>
         )}
       </SafeAreaView>

@@ -12,6 +12,7 @@ interface Data {
 interface PriceInfo {
   btc: number;
   space: number;
+  doge: number;
 }
 
 

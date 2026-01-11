@@ -136,6 +136,8 @@
   "chat_import_ex_wallet": "登录或者导入已有钱包",
   "chat_settings_switch_account": "切换账号",
   "chat_settings_add_account": "添加账号",
+  "chat_settings_switch_node": "切换节点",
+
   "chat_current_account": "当前账号",
   "s_backup_chat": "备份助记词",
   "copy_success": "复制成功",
@@ -145,5 +147,7 @@
   "community_reminder_notice_first": "为维护健康、安全的交流环境，请文明发言，避免发布违法、违规或令人不适的内容。若您发现任何不当内容或行为，可在【设置】-【意见反馈】中提交，或发送邮件至",
   "community_reminder_notice_last": "  我们的开发团队将会在 24 小时内进行核查与处理。",
   "comm_my_know": "我已知晓",
-  "comm_email_us": "devs@idchat.io."
+  "comm_email_us": "devs@idchat.io.",
+  "chat_switch_node": "提交你的IDChat节点",
+  "chat_switch_node_note": "请你将能正常运营的IDChat 节点信息提交到Email: dev@showpay.io邮件内容需包含节点的 URL，名字等信息十分感谢!"
 }

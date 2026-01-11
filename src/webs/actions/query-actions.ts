@@ -14,6 +14,8 @@ import * as GetTokenBalance from './lib/query/get-token-balance';
 import * as GetXPublicKey from './lib/query/get-extended-public-key';
 import * as PreviewTransaction from './lib/query/preview-transaction';
 import * as GetPKHByPath from './lib/query/get-pkh-by-path';
+import * as GetGlobalMetaid from './lib/query/get-global-metaid';
+import * as createPin from './create-pin'
 // import * as Listen from '../lib/actions/listen'
 
 // // BTC
@@ -32,6 +34,12 @@ import * as autoPaymentStatus from './auto-payment-status';
 import * as StorageChunk from './lib/query/storage-chunk';
 import * as Connect from './lib/authorize/connect';
 import * as SignBTCMessage from './lib/authorize/btc/sign-message';
+
+//DOGE
+import * as GetDOGEBalance from './lib/query/doge/get-balance';
+import * as GetDOGEAddress from './lib/query/doge/get-address';
+import * as GetDOGEPublicKey from './lib/query/doge/get-public-key';
+import * as GetDOGEUtxos from './lib/query/doge/get-utxos';
 
 export default {
   // Listen,
@@ -60,6 +68,12 @@ export default {
   GetBTCAddressType,
   AddSafeUtxo,
 
+  // DOGE
+  GetDOGEBalance,
+  GetDOGEAddress,
+  GetDOGEPublicKey,
+  GetDOGEUtxos,
+
   //common
   ECDH,
   SmallPay: SmallPay,
@@ -67,6 +81,7 @@ export default {
   NeedWebRefresh,
   OpenAppBrowser,
   GetAppVersionCode,
-  GetPKHByPath
-  // StorageChunk
+  GetPKHByPath,
+  GetGlobalMetaid,
+  createPin,
 } as { [key: string]: QueryAction };

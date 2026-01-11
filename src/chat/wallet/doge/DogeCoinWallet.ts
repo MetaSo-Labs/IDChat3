@@ -1,7 +1,8 @@
 import { RootDataObject, RootDataObject2 } from '@/api/type/RootDataObject';
 import { ToastView } from '@/constant/Widget';
-import { isEmpty } from '@/utils/StringUtils';
+import { isEmpty, isNotEmpty } from '@/utils/StringUtils';
 import { getStorageCurrentWallet } from '@/utils/WalletUtils';
+import { AddressType } from '@metalet/utxo-wallet-sdk';
 import { HDKey } from '@scure/bip32';
 import { mnemonicToSeedSync } from '@scure/bip39';
 import * as bip39 from '@scure/bip39';
@@ -9,6 +10,7 @@ import * as dogecoin from 'dogecoinjs-lib';
 import { Transaction } from 'dogecoinjs-lib';
 
 const DERIVATION_PATH = "m/44'/3'/0'/0/0"; // Dogecoin BIP44 路径
+const DERIVATION_PATH_AS_MVC = "m/44'/10001'/0'/0/0"; // Dogecoin BIP44 路径
 
 export interface DogeUTXO {
   address: string;
@@ -29,15 +31,20 @@ export class DogeCoinWallet {
   publicKey: Buffer;
   address: string;
 
-  constructor(mnemonic: string) {
+  constructor(mnemonic: string, coinType?: number, dogeAddressType?: AddressType) {
     this.mnemonic = mnemonic;
 
     //1.从助记词生成Seed
     const seed = mnemonicToSeedSync(mnemonic); // Uint8Array
     const root = HDKey.fromMasterSeed(seed);
-
+    let child;
     //2.用DOGE 派生子密钥
-    const child = root.derive(DERIVATION_PATH);
+    //  child = root.derive(DERIVATION_PATH);
+    if (dogeAddressType == AddressType.DogeSameAsMvc||dogeAddressType == AddressType.SameAsMvc) {
+      child = root.derive(`m/44'/${coinType}'/0'/0/0`);
+    } else {
+      child = root.derive(DERIVATION_PATH);
+    }
 
     this.privateKey = Buffer.from(child.privateKey!);
     this.publicKey = Buffer.from(child.publicKey);
@@ -103,7 +110,7 @@ export class DogeCoinWallet {
       await tx.addInput(dUtxo);
     }
 
-    const fee = estimateDogeFee(utxoList.length, 2);
+    const fee = await estimateDogeFee(utxoList.length, 2);
     await tx.addOutput({ address: targetAddress, amount: Number(amountDoge) });
     console.log('Fee:', fee);
     console.log('Amount:', inputSum / 1e8);
@@ -135,10 +142,25 @@ export class DogeCoinWallet {
   }
 }
 
-export async function getDogeCoinWallet() {
-  const mnemonic = (await getStorageCurrentWallet()).mnemonic;
+export async function getDogeCoinWallet(addressDogeType?: AddressType) {
+  const walletChat = await getStorageCurrentWallet();
+  const mnemonic = walletChat.mnemonic;
   if (!mnemonic) throw new Error('No mnemonic');
-  const wallet = new DogeCoinWallet(mnemonic);
+  const coinType = walletChat.mvcTypes;
+  const addressType = isNotEmpty(walletChat.addressDogeType)
+    ? walletChat.addressDogeType
+    : AddressType.DogeSameAsMvc;
+  console.log('addressType', addressType);
+  console.log('coinType', coinType);
+  const wallet = new DogeCoinWallet(mnemonic, coinType, addressType);
+  return wallet;
+}
+
+export async function getNormalDogeCoinWallet(addressDogeType: AddressType,coinType: number) {
+  const walletChat = await getStorageCurrentWallet();
+  const mnemonic = walletChat.mnemonic;
+  if (!mnemonic) throw new Error('No mnemonic');
+  const wallet = new DogeCoinWallet(mnemonic, coinType, addressDogeType);
   return wallet;
 }
 
@@ -150,13 +172,26 @@ function normalizeToSatoshi(value: number | string): number {
   return Math.floor(v * 1e8);
 }
 
-export function estimateDogeFee(inputs: number, outputs: number) {
+export async function estimateDogeFee(inputs: number, outputs: number) {
+  const feeb = await fetchDogeFeeb();
+  console.log('Doge fee rate per byte:', feeb);
   // 1. 估算交易大小
   const txBytes = 10 + inputs * 148 + outputs * 34;
   // 2. Doge 默认费率：1 DOGE / KB = 0.001 DOGE/byte
-  const feeDoge = txBytes * 0.001;
+  // const feeDoge = txBytes * 0.001;
+  const feeDoge = txBytes * feeb;
+  console.log('Doge Fee:', feeDoge);
   return {
     bytes: txBytes,
-    feeDoge,
+    feeDoge: feeDoge,
   };
+}
+
+export async function fetchDogeFeeb(): Promise<number> {
+  const url = `https://www.metalet.space/wallet-api/v4/doge/fee/summary?net=livenet`;
+  const res = await fetch(url);
+  const data: RootDataObject2 = await res.json();
+  console.log('Doge fee data:', JSON.stringify(data));
+  const feeb = data.data.list[1].feeRate / 1e8;
+  return feeb / 1000;
 }

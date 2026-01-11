@@ -1,24 +1,33 @@
-import { View, Text, TouchableWithoutFeedback, Image, FlatList } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Image, FlatList, Modal } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { LoadingNoticeModal, NoMoreDataView, TitleBar, ToastView } from '../../constant/Widget';
 import { goBack, navigate } from '../../base/NavigationService';
 import { metaStyles, normalColor, themeColor } from '../../constant/Constants';
 import { MvcActivityRecord } from '../../types/mvcrecord';
-import { fetchDogeActivity, fetchDogeBalance, fetchMvcActivityComfird } from '../../api/metaletservice';
+import {
+  fetchDogeActivity,
+  fetchDogeBalance,
+  fetchMvcActivityComfird,
+} from '../../api/metaletservice';
 import { useData } from '../../hooks/MyProvider';
 import * as Clipboard from 'expo-clipboard';
 import { formatTime } from '../../utils/MetaFunUiils';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import { wallet_mode_observer } from '@/utils/AsyncStorageUtil';
+import { wallet_mode_observer, wallet_mode_hot } from '@/utils/AsyncStorageUtil';
+import { AddressType } from '@metalet/utxo-wallet-service';
+import { changeCurrentWalletDogeAddressType, getStorageCurrentWallet } from '@/utils/WalletUtils';
+import { WalletBean } from '@/bean/WalletBean';
 
 export default function AssetsDogeDetailPage({ route }) {
   const { myCoinType } = route.params;
   const [mvcActivityList, setMvcActivityList] = useState<MvcActivityRecord[]>([]);
-  const { mvcAddress, updateMvcAddress } = useData();
+  // const { mvcAddress, updateMvcAddress } = useData();
   const [noticeContent, setNoticeContent] = useState('Successful');
   const [isShowNotice, setIsShowNotice] = useState(false);
   const { metaletWallet, updateMetaletWallet } = useData();
+  const [isShowCopy, setIsShowCopy] = useState(false);
+  const [addressType, setAddressType] = useState(AddressType.Legacy);
   const { t } = useTranslation();
   const { walletMode, updateWalletMode } = useData();
 
@@ -27,7 +36,11 @@ export default function AssetsDogeDetailPage({ route }) {
   }, []);
 
   async function getActivityList() {
-    const dogeAddress=metaletWallet.currentDogeWallet.address;
+    const storWallet: WalletBean = await getStorageCurrentWallet();
+    const dogeAddressType = storWallet.addressDogeType;
+    setAddressType(dogeAddressType);
+
+    const dogeAddress = metaletWallet.currentDogeWallet.address;
     let mvcActivityListData = await fetchDogeActivity(dogeAddress, true);
 
     if (mvcActivityListData.length == 0) {
@@ -46,6 +59,27 @@ export default function AssetsDogeDetailPage({ route }) {
     } else {
       setMvcActivityList([...mvcActivityListData]);
     }
+  }
+
+  async function changAddressType(addressTpye) {
+    setIsShowCopy(false);
+    switch (addressTpye) {
+      case AddressType.Legacy:
+        metaletWallet.currentDogeWallet = metaletWallet.dogeLegacyWallet;
+        setAddressType(AddressType.Legacy);
+        changeCurrentWalletDogeAddressType(AddressType.Legacy);
+        break;
+      case AddressType.SameAsMvc:
+        metaletWallet.currentDogeWallet = metaletWallet.dogeSameAsMvcWallet; // fallback
+        setAddressType(AddressType.SameAsMvc);
+        changeCurrentWalletDogeAddressType(AddressType.SameAsMvc);
+        break;
+    }
+
+    // updateMvcAddress(metaletWallet.currentDogeWallet.address);
+    console.log('currentDogeWallet', metaletWallet.currentDogeWallet.address);
+
+    getActivityList();
   }
 
   function ShowNotice(notice) {
@@ -284,6 +318,153 @@ export default function AssetsDogeDetailPage({ route }) {
             </View>
           </TouchableWithoutFeedback>
         </View>
+        {/* 切换 address 类型按钮（与 BTC 页面类似） */}
+        {(walletMode == wallet_mode_hot || walletMode == undefined) && (
+          <Modal transparent={true} visible={isShowCopy}>
+            <View
+              style={{
+                flex: 1,
+                justifyContent: 'flex-end',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: '#fff',
+                  borderTopRightRadius: 10,
+                  borderTopLeftRadius: 10,
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  paddingTop: 20,
+                  paddingBottom: 30,
+                }}
+              >
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      flex: 1,
+                    }}
+                  >
+                    {t('o_select_default_address')}
+                  </Text>
+
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      setIsShowCopy(false);
+                    }}
+                  >
+                    <Image
+                      source={require('../../../image/metalet_close_big_icon.png')}
+                      style={{ width: 15, height: 15 }}
+                    />
+                  </TouchableWithoutFeedback>
+                </View>
+
+                {/* DOGE Legacy */}
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    changAddressType(AddressType.Legacy);
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      marginTop: 20,
+                      marginHorizontal: 10,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Image
+                      source={require('../../../image/doge_logo.png')}
+                      style={{ width: 35, height: 35, marginLeft: 20 }}
+                    />
+
+                    <View style={{ marginLeft: 10, flex: 1 }}>
+                      <View style={{ flexDirection: 'row' }}>
+                        <Text
+                          numberOfLines={1}
+                          ellipsizeMode="middle"
+                          style={{ fontSize: 15, width: '70%' }}
+                        >
+                          {metaletWallet.dogeLegacyWallet.getAddress()}
+                        </Text>
+                      </View>
+                      <Text
+                        style={{ marginTop: 5, fontSize: 13, color: '#999' }}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        Legacy
+                      </Text>
+                    </View>
+
+                    {addressType == AddressType.Legacy ? (
+                      <Image
+                        source={require('../../../image/wallets_select_icon.png')}
+                        style={{ width: 20, height: 20, marginRight: 10 }}
+                      />
+                    ) : null}
+                  </View>
+                </TouchableWithoutFeedback>
+
+                {/* Same as Mvc (fallback) */}
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    changAddressType(AddressType.SameAsMvc);
+                  }}
+                >
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      marginTop: 20,
+                      marginHorizontal: 10,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Image
+                      source={require('../../../image/doge_logo.png')}
+                      style={{ width: 35, height: 35, marginLeft: 20 }}
+                    />
+
+                    <View style={{ marginLeft: 10, flex: 1 }}>
+                      <View style={{ flexDirection: 'row' }}>
+                        <Text
+                          numberOfLines={1}
+                          ellipsizeMode="middle"
+                          style={{ fontSize: 15, width: '70%' }}
+                        >
+                          {metaletWallet.dogeSameAsMvcWallet.getAddress()}
+                        </Text>
+                      </View>
+                      <Text
+                        style={{ marginTop: 5, fontSize: 13, color: '#999' }}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        Default
+                      </Text>
+                    </View>
+                    {addressType == AddressType.SameAsMvc ? (
+                      <Image
+                        source={require('../../../image/wallets_select_icon.png')}
+                        style={{ width: 20, height: 20, marginRight: 10 }}
+                      />
+                    ) : null}
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </View>
+          </Modal>
+        )}
         {/* <View
           style={{
             justifyContent: 'center',
@@ -361,6 +542,22 @@ export default function AssetsDogeDetailPage({ route }) {
         </View> */}
 
         <TitleBar />
+
+        {/* address type switch button */}
+        {(walletMode == wallet_mode_hot || walletMode == undefined) && (
+          <View style={{ alignItems: 'flex-end', paddingRight: 20, marginTop: 8 }}>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setIsShowCopy(true);
+              }}
+            >
+              <Image
+                source={require('../../../image/assert_adress_type_icon.png')}
+                style={{ width: 22, height: 22 }}
+              />
+            </TouchableWithoutFeedback>
+          </View>
+        )}
 
         {/* <ListHeader /> */}
         {/* 尾部 */}

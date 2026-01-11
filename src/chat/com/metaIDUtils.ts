@@ -8,10 +8,8 @@ import { getCurrentMvcWallet } from '@/wallet/wallet';
 export async function isRegisterMetaID() {
   //   console.log('isRegisterMetaID address:' + address);
   const wallet = await getCurrentMvcWallet();
-  console.log('isRegisterMetaID address:' + wallet.getAddress());
 
   const result: UserMetaIDinfoBean = await fetchUserMetaIDInfo(wallet.getAddress());
-  console.log('isRegisterMetaID result:' + JSON.stringify(result));
   if (isNotEmpty(result.name)) {
     return true;
   } else {

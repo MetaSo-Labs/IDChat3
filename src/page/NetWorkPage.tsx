@@ -38,7 +38,7 @@ export default function NetWorkPage() {
       // await AsyncStorageUtil.setItem(network_key, network_all);
     }
     // eventBus.publish(refreshHomeLoadingEvent,{data:''})
-    navigate("Tabs");
+    navigate("WalletTabs");
     console.log("切换网络成功"+changeNetwork);
     updateNetWork(changeNetwork);
 

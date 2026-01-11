@@ -1,22 +1,29 @@
-import { metaletApiV3, metaletApiV4 } from "./request";
-import { PageResult } from "./types/base";
-import { getNetwork } from "@/lib/network";
-import { useQuery } from "@tanstack/react-query";
-import { Chain } from "@metalet/utxo-wallet-service";
-import { FEEB } from "@/lib/config";
+import { metaletApiV3, metaletApiV4 } from './request';
+import { PageResult } from './types/base';
+import { getNetwork } from '@/lib/network';
+import { useQuery } from '@tanstack/react-query';
+import { Chain } from '@metalet/utxo-wallet-service';
+import { FEEB } from '@/lib/config';
 
 export const fetchBtcTxHex = async (txId: string): Promise<string> => {
   return metaletApiV3<{ rawTx: string }>(`/tx/raw`)
-    .get({ net: getNetwork(Chain.BTC), txId, chain: "btc" })
+    .get({ net: getNetwork(Chain.BTC), txId, chain: 'btc' })
     .then((res) => res.rawTx);
 };
 
 export const broadcastBTCTx = async (rawTx: string) => {
   return await metaletApiV3<string>(`/tx/broadcast`).post({
-    chain: "btc",
+    chain: 'btc',
     net: getNetwork(Chain.BTC),
     rawTx,
   });
+};
+
+export const broadcastTx = async (rawTx: string, chain: Chain) => {
+  // const net = getNet()
+  const net = getNetwork(Chain.BTC);
+
+  return await metaletApiV3<string>(`/tx/broadcast`).post({ chain, net, rawTx });
 };
 
 export interface FeeRate {
@@ -31,29 +38,28 @@ export const getBTCTRate = async (): Promise<PageResult<FeeRate>> => {
   });
 };
 
-
 export const getMVCTRate = async (): Promise<PageResult<FeeRate>> => {
-  const net = getNetwork(Chain.BTC)
-  return metaletApiV4<PageResult<FeeRate>>(`/mvc/fee/summary`).get({ net })
-}
+  const net = getNetwork(Chain.BTC);
+  return metaletApiV4<PageResult<FeeRate>>(`/mvc/fee/summary`).get({ net });
+};
 export const getDefaultMVCTRate = async (): Promise<number> => {
   try {
-    const feeRes = await getMVCTRate()
+    const feeRes = await getMVCTRate();
     if (feeRes.list.length) {
-      const fastRate = feeRes.list.find((rate) => rate.title === 'Fast')
+      const fastRate = feeRes.list.find((rate) => rate.title === 'Fast');
       // console.log('Using default MVC fee rate 1111费率:', fastRate)
-      return fastRate ? fastRate.feeRate : FEEB // Return fast rate or default fee
+      return fastRate ? fastRate.feeRate : FEEB; // Return fast rate or default fee
     }
   } catch (error) {
-    console.error('Error fetching MVC fee rate:', error)
+    console.error('Error fetching MVC fee rate:', error);
   }
-  
+
   // console.log('Using default MVC fee rate 费率:', FEEB)
-  return FEEB // Default fee rate in case of error
-}
+  return FEEB; // Default fee rate in case of error
+};
 export const useBTCRateQuery = (options?: { enabled: boolean }) => {
   return useQuery({
-    queryKey: ["BTCTRate"],
+    queryKey: ['BTCTRate'],
     queryFn: () => getBTCTRate(),
     refetchInterval: 30000,
     select: (result) => result.list,

@@ -32,7 +32,7 @@ export async function process(params: any) {
     const asset = await MediaLibrary.createAssetAsync(fileUri);
     await MediaLibrary.createAlbumAsync('Download', asset, false);
 
-    Alert.alert('保存成功', '图片已保存到相册 🎉');
+    // Alert.alert('保存成功', '图片已保存到相册 🎉');
     console.log('图片保存成功:', fileUri);
     ToastView({ text: 'successfully', type: 'success' });
 

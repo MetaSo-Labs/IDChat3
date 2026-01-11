@@ -1,7 +1,7 @@
 // FIXME: Remove bitcoinjs-lib
 import { networks } from "bitcoinjs-lib";
 import useNetworkStore from "@/stores/useNetworkStore";
-import { Chain, Net } from "@metalet/utxo-wallet-service";
+import { Chain } from "@metalet/utxo-wallet-sdk";
 
 export function getNetwork(chain?: Chain) {
   const network = useNetworkStore.getState().network;

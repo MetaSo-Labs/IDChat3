@@ -1,6 +1,8 @@
 import './globals.js';
+
 import 'intl-pluralrules';
 import './src/language/i18n';
+
 import { useEffect } from 'react';
 import { UserProvider } from './src/hooks/MyProvider';
 import AppNavigator from './src/base/AppNavigator.jsx';
@@ -18,6 +20,7 @@ import {
 } from 'react-native';
 // import 'i18n';
 
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -29,6 +32,7 @@ const queryClient = new QueryClient({
 });
 
 export default function App() {
+  
   return (
     <UserProvider>
       <QueryClientProvider client={queryClient}>

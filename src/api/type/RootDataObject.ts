@@ -27,6 +27,14 @@ interface ApiResponse {
   list: [];
 }
 
+export interface RootDataObject4 {
+  code: number;
+  message: string;
+  processingTime: number;
+  data: [];
+}
+
+
 // interface Data {
 //   priceInfo: Object;
 // }

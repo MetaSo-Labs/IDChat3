@@ -136,6 +136,7 @@
   "chat_import_ex_wallet": "Log in or import an existing Account",
   "chat_settings_switch_account": "Switch Account",
   "chat_settings_add_account": "Add Account",
+  "chat_settings_switch_node": "Switch Chat Node",
   "chat_current_account": "Current",
   "s_backup_chat": "Backup Mnemonic",
   "copy_success": "Copy Successfully",
@@ -149,6 +150,7 @@
   "comm_my_know": "I already know",
   "comm_email_us": "devs@idchat.io.",
 
-  "chat_settings_toolkit": "Toolkit"
-
+  "chat_settings_toolkit": "Toolkit",
+  "chat_switch_node": "Submit your IDChat node",
+  "chat_switch_node_note": "Please submit the lDChat node information that can operate normally to Email: dev@showpay.io The email content should include information such as the node's URL and name.Many thanks!"
 }

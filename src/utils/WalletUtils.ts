@@ -216,6 +216,18 @@ export async function changeCurrentWalletAddressType(changeAddressType: AddressT
   // await AsyncStorageUtil.updateItem(wallets_key, wallets);
 }
 
+
+export async function changeCurrentWalletDogeAddressType(changeAddressType: AddressType) {
+  const wallets: WalletBean[] = await getWalletBeans();
+  const walletID = await getCurrentWalletID();
+  const wallet = wallets.find((wallet) => wallet.id == walletID);
+  wallet.addressDogeType = changeAddressType;
+  await storage.set(wallets_key, wallets);
+  // await AsyncStorageUtil.updateItem(wallets_key, [...wallets, wallet]);
+  // await AsyncStorageUtil.updateItem(wallets_key, wallets);
+}
+
+
 ///////////utils
 export function parseToSpace(space: string) {
   return (parseFloat(space) / 100000000).toFixed(8);

@@ -5,7 +5,14 @@ import { CloseView, NoMoreDataView, useEasyToast } from '../constant/Widget';
 import * as FileSystem from 'expo-file-system';
 import EasyToast from 'react-native-easy-toast';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AsyncStorageUtil, network_all, network_btc, network_doge, network_key, network_mvc } from '../utils/AsyncStorageUtil';
+import {
+  AsyncStorageUtil,
+  network_all,
+  network_btc,
+  network_doge,
+  network_key,
+  network_mvc,
+} from '../utils/AsyncStorageUtil';
 import { useData } from '../hooks/MyProvider';
 import { navigate } from '../base/NavigationService';
 import { useFocusEffect } from '@react-navigation/native';
@@ -23,6 +30,7 @@ export default function AssetsPage() {
   const { netWork, updateNetWork } = useData();
   const { spaceBalance, updateSpaceBalance } = useData();
   const { btcBalance, updateSetBtcBalance } = useData();
+  const { dogeBalance, updateDogeBalance } = useData();
 
   const [hasData, setHasData] = useState(false);
   const [myfile, setFolders] = useState<string[]>([]);
@@ -56,6 +64,7 @@ export default function AssetsPage() {
     React.useCallback(() => {
       // console.log("AssetsPage page is focused");
       // getBtcBalance();
+      console.log('dogeBalance==', dogeBalance);
     }, []),
   );
 
@@ -82,13 +91,9 @@ export default function AssetsPage() {
     // console.log("mvcAddress", mvcAddress);
   }
 
-  useEffect(() => {
+  // useEffect(() => {
 
-    // console.log("AssetsPage useEffect called  "+netWork);
-    // showToast();
-    // getMVCBalance();
-    getBtcBalance();
-  }, []);
+  // }, [spaceBalance, btcBalance, dogeBalance,]);
 
   // AsyncStorageUtil.setItem("test", "test1111");
   // AsyncStorageUtil.getItem("test").then((res) => {
@@ -98,12 +103,9 @@ export default function AssetsPage() {
   async function getBtcBalance() {
     // const net=await AsyncStorageUtil.getItem(network_key);
     // console.log('获取 BTC 余额'+net);
-
     // const wallet = await getCurrentWallet(Chain.BTC);
     // const btcAddress = await wallet.getAddress();
-
     // console.log('btcAddress获取到的地址是：', btcAddress);
-
     // const balance: RootBtcBalanceObject = await fetchBtcBalance(btcAddress);
     // setBtcBalance(balance.data);
     // console.log('btcAddress', JSON.stringify(balance));
@@ -287,7 +289,8 @@ export default function AssetsPage() {
 
               <View>
                 <Text style={{ color: '#333', fontSize: 16, textAlign: 'right' }}>
-                  {metaletWallet.currentDogeBalance!} DOGE{' '}
+                  {/* {metaletWallet.currentDogeBalance!} DOGE{' '} */}
+                  {dogeBalance!} DOGE{' '}
                 </Text>
                 <Text
                   style={{
@@ -512,7 +515,8 @@ export default function AssetsPage() {
 
               <View>
                 <Text style={{ color: '#333', fontSize: 16, textAlign: 'right' }}>
-                  {metaletWallet.currentDogeBalance!} DOGE{' '}
+                  {/* {metaletWallet.currentDogeBalance!} DOGE{' '} */}
+                  {dogeBalance!} DOGE{' '}
                 </Text>
                 <Text
                   style={{

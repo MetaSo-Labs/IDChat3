@@ -1,5 +1,5 @@
 import { DogeCoinWallet } from '@/chat/wallet/doge/DogeCoinWallet';
-import { BtcHotWallet } from '@metalet/utxo-wallet-sdk';
+import { BtcHotWallet, DogeWallet } from '@metalet/utxo-wallet-sdk';
 import { BtcWallet, MvcWallet } from '@metalet/utxo-wallet-service';
 
 class MetaletWallet {
@@ -8,6 +8,7 @@ class MetaletWallet {
   currentMvcWallet: MvcWallet;
   currentBtcWallet: BtcWallet;
   currentDogeWallet: DogeCoinWallet;
+  // currentDogeWallet: DogeWallet;
 
   //cold Wallet
   currentBtcColdWallet: BtcHotWallet;
@@ -19,6 +20,11 @@ class MetaletWallet {
   btcNestedSegwitWallet: BtcWallet;
   btcTaprootWallet: BtcWallet;
   btcSameAsWallet: BtcWallet;
+
+  //doge
+  dogeLegacyWallet: DogeCoinWallet;
+  dogeSameAsMvcWallet: DogeCoinWallet;
+
 
   //当前钱包余额
   currentSumAssert: string = '0.00';

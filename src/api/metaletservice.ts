@@ -19,12 +19,13 @@ import { Mrc20RecordData } from './type/Mrc20RecordData';
 import { t } from 'i18next';
 import { TxIdData } from './type/TxId';
 import { MvcActivityRecord } from '@/types/mvcrecord';
-import { RootDataObject, RootDataObject2, RootDataObject3 } from './type/RootDataObject';
+import { RootDataObject, RootDataObject2, RootDataObject3, RootDataObject4 } from './type/RootDataObject';
 import { PINsBean } from './type/PINsBean';
 import { Mrc721ItemBean } from './type/Mrc721ItemBean';
 import { Mrc721SerListBean } from './type/Mrc721SerListBean';
 import { DappListBean } from './type/DappListBean';
 import { UserMetaIDinfoBean } from './type/UserMetaIDinfoBean';
+import { ChatNode } from '@/types/ChatBean';
 
 // export const BASE_MVC_API_URL = "https://mainnet.mvcapi.com";
 export const BASE_MVC_API_URL_TESTNET = 'https://testnet.mvcapi.com';
@@ -89,6 +90,7 @@ export async function fetchBtcBalance(address: string): Promise<RootBtcBalanceOb
     address,
     net: network,
   });
+  console.log('fetchBtcBalance', data);
   return data;
 }
 
@@ -502,7 +504,6 @@ export async function fetchDappList(): Promise<DappListBean> {
 //29.metaID  info
 export async function fetchUserMetaIDInfo(address: string): Promise<UserMetaIDinfoBean> {
   const network = await getWalletNetwork();
-  // https://man.metaid.io/api/info/address/1C2XjqoXHRegJNnmJqGDMt3rbAcrYLX4L9
   const data: RootDataObject = await get(
     BASE_METAID_IO_URL + '/api/info/address/' + address,
     true,
@@ -511,9 +512,7 @@ export async function fetchUserMetaIDInfo(address: string): Promise<UserMetaIDin
       address: address,
     },
   );
-  console.log('fetchUserMetaIDInfo: ', data);  //1C2XjqoXHRegJNnmJqGDMt3rbAcrYLX4L9
   const dataUserInfo: UserMetaIDinfoBean = data.data as UserMetaIDinfoBean;
-
   return dataUserInfo;
 }
 
@@ -565,5 +564,16 @@ export async function fetchDogeActivity(address: string, isConfirm: boolean) {
   return data;
 }
 
+
+
+export async function fetchChatNode() {
+  const network = await getWalletNetwork(Chain.BTC);
+  const result: RootDataObject4 = await get(
+    BASE_IDCHAT_IO_URL  + '/idchat-base/v1/chat-nodes',
+    true,
+  );
+  const data = result.data as ChatNode[];
+  return data;
+}
 
 

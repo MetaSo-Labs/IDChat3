@@ -66,7 +66,7 @@ export default function SendDogeSuccessPage({ route }) {
                 style={{ width: 36, height: 36 }}
               />
               <Text style={{ color: '#000', fontSize: 16, marginLeft: 10 }}>
-                {result.amount} SPACE
+                {result.amount} DOGE
               </Text>
             </View>
 

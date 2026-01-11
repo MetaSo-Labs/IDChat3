@@ -223,34 +223,64 @@ export default function SwitchAccountPage() {
 
   const AccountFoolerView = () => {
     return (
-      <TouchableWithoutFeedback
-        onPress={async () => {
-          const rand = getRandomID();
-          console.log('随机数' + rand);
-          updateWebLogout(rand);
-          navigate('WelcomeWalletPage');
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: 'white',
-            borderColor: '#333333',
-            padding: 13,
-            flexDirection: 'row',
-            alignItems: 'center',
-            flex: 1,
-            marginTop: 10,
+      <View style={{ marginBottom: 100 }}>
+        <TouchableWithoutFeedback
+          onPress={async () => {
+            const rand = getRandomID();
+            console.log('随机数' + rand);
+            updateWebLogout(rand);
+            navigate('WelcomeWalletPage');
           }}
         >
-          <AvatarImageView size={53} source={require('@image/buzz_chain_normal_icon.png')} />
-          <View style={{ flex: 1, marginLeft: 10 }}>
-            <Text style={[metaStyles.defaultText, { fontWeight: 'bold' }]}>
-              {t('chat_settings_add_account')}
-            </Text>
-            {/* <Text style={[{ fontSize: 12, marginTop: 5, color: '#666666' }]}>{item.metaId}</Text> */}
+          <View
+            style={{
+              backgroundColor: 'white',
+              borderColor: '#333333',
+              padding: 13,
+              flexDirection: 'row',
+              alignItems: 'center',
+              flex: 1,
+              marginTop: 10,
+            }}
+          >
+            <AvatarImageView size={53} source={require('@image/buzz_chain_normal_icon.png')} />
+            <View style={{ flex: 1, marginLeft: 10 }}>
+              <Text style={[metaStyles.defaultText, { fontWeight: 'bold' }]}>
+                {t('chat_settings_add_account')}
+              </Text>
+              {/* <Text style={[{ fontSize: 12, marginTop: 5, color: '#666666' }]}>{item.metaId}</Text> */}
+            </View>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+{/* 
+        <TouchableWithoutFeedback
+          onPress={async () => {
+            navigate('SwitchChatNodePage');
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: 'white',
+              borderColor: '#333333',
+              padding: 13,
+              flexDirection: 'row',
+              alignItems: 'center',
+              flex: 1,
+              marginTop: 10,
+            }}
+          >
+            <AvatarImageView size={53} source={require('@image/buzz_chain_normal_icon.png')} />
+            <View style={{ flex: 1, marginLeft: 10 }}>
+              <Text style={[metaStyles.defaultText, { fontWeight: 'bold' }]}>
+                {t('chat_settings_switch_node')}
+              </Text>
+            </View>
+          </View>
+        </TouchableWithoutFeedback> */}
+
+
+
+      </View>
     );
   };
 

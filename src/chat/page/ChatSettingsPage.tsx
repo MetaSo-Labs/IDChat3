@@ -136,7 +136,6 @@ export default function ChatSettingsPage(props: any) {
   async function intUserMetaIDInfo() {
     if (isRegisterMetaID()) {
       const metaIDInfo: UserMetaIDinfoBean = await getUserMetaIDInfo();
-      console.log('metaIDInfo ', metaIDInfo);
 
       const currentStorageWallet: WalletBean = await getStorageCurrentWallet();
 
@@ -149,10 +148,11 @@ export default function ChatSettingsPage(props: any) {
           metaid: metaIDInfo.metaid,
         });
       }
-      if (isNotEmpty(metaIDInfo.avatar)) {
+      if (isNotEmpty(metaIDInfo.avatar) && isNotEmpty(metaIDInfo.avatarId)) {
         setSelectedImage(getMetaIDUserImageUrl(metaIDInfo.avatar));
         currentStorageWallet.avatarUrl = getMetaIDUserImageUrl(metaIDInfo.avatar);
       } else {
+        currentStorageWallet.avatarUrl = '';
         setSelectedImage('');
       }
 
@@ -200,13 +200,13 @@ export default function ChatSettingsPage(props: any) {
       console.log('codeVersion', codeVersion);
       console.log('buildNumber', buildNumber);
 
-      if (codeVersion > parseFloat(buildNumber)) { 
+      if (codeVersion > parseFloat(buildNumber)) {
         console.log('update  显示更新弹窗');
         setIsShowLoading(false);
         setUpdate(true);
       }
     }
-  }                                                                                                                                                      
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -382,7 +382,7 @@ export default function ChatSettingsPage(props: any) {
               </View>
             </View>
 
-           <TouchableWithoutFeedback
+            <TouchableWithoutFeedback
               onPress={() => {
                 navigate('DappWebsPage', { url: 'https://show.now' });
               }}
@@ -390,28 +390,26 @@ export default function ChatSettingsPage(props: any) {
               <View
                 style={{
                   flexDirection: 'row',
-                  marginTop: 30,
+                  marginTop: 27,
                   alignItems: 'center',
                   justifyContent: 'center',
                   backgroundColor: 'white',
                   paddingHorizontal: 15,
-                  paddingVertical: 10,
+                  paddingVertical: 8,
                 }}
               >
                 <Image
                   source={require('@image/settings_buzz_icon.png')}
                   style={{ width: 30, height: 30 }}
                 />
-                <Text style={{ marginLeft: 10, color: '#303133', fontSize: 16 }}>
-                  Buzz
-                </Text>
+                <Text style={{ marginLeft: 10, color: '#303133', fontSize: 16 }}>Buzz</Text>
                 <View style={{ flex: 1 }} />
                 <Image
                   source={require('@image/list_icon_ins.png')}
                   style={{ width: 20, height: 20 }}
                 />
-              </View> 
-            </TouchableWithoutFeedback>  
+              </View>
+            </TouchableWithoutFeedback>
 
             <TouchableWithoutFeedback
               onPress={() => {
@@ -421,12 +419,12 @@ export default function ChatSettingsPage(props: any) {
               <View
                 style={{
                   flexDirection: 'row',
-                  marginTop: 30,
+                  marginTop: 23,
                   alignItems: 'center',
                   justifyContent: 'center',
                   backgroundColor: '#fff',
                   paddingHorizontal: 15,
-                  paddingVertical: 10,
+                  paddingVertical: 8,
                 }}
               >
                 <Image
@@ -472,7 +470,7 @@ export default function ChatSettingsPage(props: any) {
                   justifyContent: 'center',
                   backgroundColor: 'white',
                   paddingHorizontal: 15,
-                  paddingVertical: 10,
+                  paddingVertical: 8,
                 }}
               >
                 <Image
@@ -498,12 +496,12 @@ export default function ChatSettingsPage(props: any) {
               <View
                 style={{
                   flexDirection: 'row',
-                  marginTop: 30,
+                  marginTop: 23,
                   alignItems: 'center',
                   justifyContent: 'center',
                   backgroundColor: 'white',
                   paddingHorizontal: 15,
-                  paddingVertical: 10,
+                  paddingVertical: 8,
                 }}
               >
                 <Image
@@ -532,12 +530,12 @@ export default function ChatSettingsPage(props: any) {
               <View
                 style={{
                   flexDirection: 'row',
-                  marginTop: 20,
+                  marginTop: 1,
                   alignItems: 'center',
                   justifyContent: 'center',
                   backgroundColor: 'white',
                   paddingHorizontal: 15,
-                  paddingVertical: 10,
+                  paddingVertical: 8,
                 }}
               >
                 <Image
@@ -546,6 +544,41 @@ export default function ChatSettingsPage(props: any) {
                 />
                 <Text style={{ marginLeft: 10, color: '#303133', fontSize: 16 }}>
                   {t('chat_settings_switch_account')}
+                </Text>
+                <View style={{ flex: 1 }} />
+                <Image
+                  source={require('@image/list_icon_ins.png')}
+                  style={{ width: 20, height: 20 }}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+
+
+              <TouchableWithoutFeedback
+              onPress={() => {
+                // const rand = getRandomID();
+                // console.log('随机数' + rand);
+                // updateWebLogout(rand);
+                navigate('SwitchChatNodePage');
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginTop: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: 'white',
+                  paddingHorizontal: 15,
+                  paddingVertical: 8,
+                }}
+              >
+                <Image
+                  source={require('@image/chat_me_switch_accout_icon.png')}
+                  style={{ width: 30, height: 30 }}
+                />
+                <Text style={{ marginLeft: 10, color: '#303133', fontSize: 16 }}>
+                  {t('chat_settings_switch_node')}
                 </Text>
                 <View style={{ flex: 1 }} />
                 <Image
@@ -568,7 +601,7 @@ export default function ChatSettingsPage(props: any) {
                   justifyContent: 'center',
                   backgroundColor: 'white',
                   paddingHorizontal: 15,
-                  paddingVertical: 10,
+                  paddingVertical: 8,
                 }}
               >
                 <Image

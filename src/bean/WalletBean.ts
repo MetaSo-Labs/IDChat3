@@ -25,6 +25,9 @@ export type WalletBean = {
   metaId?:String;
   avatarUrl?:String;                                                                                            
   userName?:String;
+
+  //doge
+  addressDogeType?: AddressType;
   
 
 

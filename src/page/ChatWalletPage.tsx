@@ -77,7 +77,9 @@ import { BtcHotWallet } from '@metalet/utxo-wallet-sdk';
 import i18n from '@/language/i18n';
 import { useTranslation } from 'react-i18next';
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
-import { getDogeCoinWallet } from '@/chat/wallet/doge/DogeCoinWallet';
+import { getDogeCoinWallet, getNormalDogeCoinWallet } from '@/chat/wallet/doge/DogeCoinWallet';
+import { usePollingController } from './wallet/usePollingController';
+import { WalletBean } from '@/bean/WalletBean';
 
 const storage = createStorage();
 
@@ -93,6 +95,8 @@ export default function ChatWalletPage({ navigation }) {
   const { walletMode, updateWalletMode } = useData();
   const { spaceBalance, updateSpaceBalance } = useData();
   const { btcBalance, updateSetBtcBalance } = useData();
+  const { dogeBalance, updateDogeBalance } = useData();
+
   // const [sumBalance, setSumBalance] = useState<string>("0.0");
   const { currentSumBalance, updateCurrentSumBalance } = useData();
 
@@ -107,6 +111,13 @@ export default function ChatWalletPage({ navigation }) {
   const [taprootAddress, setTaprootAddress] = useState<string>();
   const [nestedSegwitAddress, setNestedSegwitAddress] = useState<string>();
   const [nativeSegwitAddress, setNativeSegwitAddress] = useState<string>();
+
+  //doge 地址
+  const [legacyDogeAddress, setLegacyDogeAddress] = useState<string>();
+  const [dogeSameAsMvcAddress, setDogeSameAsMvcAddress] = useState<string>();
+
+
+
   // const [sameBtcAsMvcAddress, setSameBtcAsMvcAddress] = useState<string>();
   const { btcSameAsMvcAddress, updateBtcSameAsMvcAddress } = useData();
 
@@ -137,6 +148,7 @@ export default function ChatWalletPage({ navigation }) {
   const platformNow = Platform.OS;
   const { isShowPay, updateIsShowPay } = useData();
   const { t } = useTranslation(); // 获取翻译函数
+  const { start, stop } = usePollingController();
 
   // "package": "com.metalet.utxowallet",
   // "package": "com.utxo.wallet",
@@ -166,7 +178,7 @@ export default function ChatWalletPage({ navigation }) {
     // }, 15000);
 
     // 清除定时器，防止内存泄漏
-    // return () => clearInterval(intervalId);
+    return () => stop();
   }, []);
 
   useEffect(() => {
@@ -283,6 +295,7 @@ export default function ChatWalletPage({ navigation }) {
 
     updateSpaceBalance(showbalance.spaceBalance);
     updateSetBtcBalance(showbalance.btcBalance);
+    updateDogeBalance(showbalance.dogeBalance);
 
     if (sumBalance == '0.0') {
       updateCurrentSumBalance(showbalance.sumAssert);
@@ -334,9 +347,12 @@ export default function ChatWalletPage({ navigation }) {
         }
       });
 
-      const nowWallet = await getStorageCurrentWallet();
+      const nowWallet:WalletBean = await getStorageCurrentWallet();
       const nowAccount = await getCurrentWalletAccount();
       const nowDogeWallet = await getDogeCoinWallet();
+
+
+      
 
       setWalletName(nowWallet.name);
       setaccountName(nowAccount.name);
@@ -351,6 +367,15 @@ export default function ChatWalletPage({ navigation }) {
       setNestedSegwitAddress(btcNestedSegwitWallet.getAddress());
       const btcLegacyWallet = await getBtcWallet(AddressType.Legacy);
       setLegacyAddress(btcLegacyWallet.getAddress());
+
+      //doge
+      const dogeLegacyWallet = await getNormalDogeCoinWallet(AddressType.Legacy, 3);
+      const dogeSameAsMvcWallet = await getNormalDogeCoinWallet(AddressType.SameAsMvc, nowWallet.mvcTypes);
+      setLegacyDogeAddress(await dogeLegacyWallet.getAddress());
+      setDogeSameAsMvcAddress(await dogeSameAsMvcWallet.getAddress());
+
+
+
       const btcSameAsLegacyWallet = await getBtcWallet(AddressType.SameAsMvc);
       updateBtcSameAsMvcAddress(btcSameAsLegacyWallet.getAddress());
       const mvcWallet = await getCurrentMvcWallet();
@@ -358,7 +383,6 @@ export default function ChatWalletPage({ navigation }) {
 
       updateMvcAddress(mvcWallet.getAddress());
       updateDogeAddress(nowDogeWallet.getAddress());
-      // console.log('address mvc : ',mvcWallet.getAddress())
       updateBtcAddress(currentBtcWallet.getAddress());
 
       metaletWallet.currentBtcWallet = currentBtcWallet;
@@ -369,6 +393,8 @@ export default function ChatWalletPage({ navigation }) {
       metaletWallet.btcNestedSegwitWallet = btcNestedSegwitWallet;
       metaletWallet.btcTaprootWallet = btcTaprootWallet;
       metaletWallet.btcSameAsWallet = btcSameAsLegacyWallet;
+      metaletWallet.dogeLegacyWallet=dogeLegacyWallet;
+      metaletWallet.dogeSameAsMvcWallet=dogeSameAsMvcWallet;
 
       //webs
       const btcWalletWebs = metaletWallet.currentBtcWallet;
@@ -377,7 +403,11 @@ export default function ChatWalletPage({ navigation }) {
       setCurrentWallet({ btcWallet: btcWalletWebs, mvcWallet: mvcWalletWebs });
 
       updateMetaletWallet(metaletWallet);
-      getShowBalance();
+      // getShowBalance();
+      start(() => {
+        console.log('轮询获取余额---立刻执行一次');
+        getShowBalance();
+      }, 15000);
     }
   }
 
@@ -949,7 +979,7 @@ export default function ChatWalletPage({ navigation }) {
                 </TouchableWithoutFeedback>
               </View>
 
-              {/* mvc */}
+              {/* doge */}
               <View
                 style={{
                   flexDirection: 'row',
@@ -984,7 +1014,7 @@ export default function ChatWalletPage({ navigation }) {
                           textAlign: 'center',
                         }}
                       >
-                        DOGE
+                        Default
                       </Text>
                     </View>
                   </View>
@@ -993,13 +1023,13 @@ export default function ChatWalletPage({ navigation }) {
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    {dogeAddress}
+                    {dogeSameAsMvcAddress}
                   </Text>
                 </View>
 
                 <TouchableWithoutFeedback
                   onPress={async () => {
-                    const dogeAddress = await metaletWallet.currentDogeWallet.getAddress();
+                    const dogeAddress = await metaletWallet.dogeSameAsMvcWallet.getAddress();
                     ShowNotice(dogeAddress);
                   }}
                 >
@@ -1009,6 +1039,67 @@ export default function ChatWalletPage({ navigation }) {
                   />
                 </TouchableWithoutFeedback>
               </View>
+
+                <View
+                style={{
+                  flexDirection: 'row',
+                  marginTop: 20,
+                  marginHorizontal: 10,
+                  alignItems: 'center',
+                }}
+              >
+                <Image
+                  source={require('../../image/doge_logo.png')}
+                  style={{ width: 35, height: 35, marginLeft: 20 }}
+                />
+
+                <View style={{ marginLeft: 10, flex: 1 }}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>DOGE</Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        marginLeft: 5,
+                        backgroundColor: '#F5F7F9',
+                        paddingHorizontal: 5,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 5,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: '#666',
+                          fontSize: 10,
+                          textAlign: 'center',
+                        }}
+                      >
+                        Legacy
+                      </Text>
+                    </View>
+                  </View>
+                  <Text
+                    style={{ marginTop: 5, fontSize: 10, color: '#666' }}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {legacyDogeAddress}
+                  </Text>
+                </View>
+
+                <TouchableWithoutFeedback
+                  onPress={async () => {
+                    const dogeAddress = await metaletWallet.dogeLegacyWallet.getAddress();
+                    ShowNotice(dogeAddress);
+                  }}
+                >
+                  <Image
+                    source={require('../../image/meta_copy_icon.png')}
+                    style={{ width: 20, height: 20, marginRight: 10 }}
+                  />
+                </TouchableWithoutFeedback>
+              </View>
+
 
               {/* over */}
             </View>
@@ -1089,7 +1180,7 @@ export default function ChatWalletPage({ navigation }) {
             (netWork == network_all && (
               <TouchableWithoutFeedback
                 onPress={() => {
-                  // navigate('NetWorkPage');
+                  navigate('NetWorkPage');
                 }}
               >
                 <Image
@@ -1342,7 +1433,7 @@ export default function ChatWalletPage({ navigation }) {
           {netWork == network_btc && <MyTabs02 />}
 
           {netWork == network_mvc && <MyTabs03 />}
-          
+
           {netWork == network_doge && <MyTabs03 />}
         </View>
       </View>

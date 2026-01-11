@@ -116,6 +116,7 @@ import MergeFtPage from '@/chat/page/MergeFtPage';
 import AssetsDogeDetailPage from '@/page/home/AssetsDogeDetailPage';
 import SendDogePage from '@/page/home/SendDogePage';
 import SendDogeSuccessPage from '@/page/home/SendDogeSuccessPage';
+import SwitchChatNodePage from '@/chat/page/SwitchChatNodePage';
 
 ////////
 
@@ -249,6 +250,7 @@ const StackNavigator = () => (
     <Stack.Screen name="AssetsDogeDetailPage" component={AssetsDogeDetailPage} />
     <Stack.Screen name="SendDogePage" component={SendDogePage} />
     <Stack.Screen name="SendDogeSuccessPage" component={SendDogeSuccessPage} />
+    <Stack.Screen name="SwitchChatNodePage" component={SwitchChatNodePage} />
 
     {/* <Stack.Screen name="PushPage " component={PushPage} /> */}
   </Stack.Navigator>
